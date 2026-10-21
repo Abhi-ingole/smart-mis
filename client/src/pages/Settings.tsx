@@ -4,23 +4,21 @@ import { useDatasets } from "../state/datasets";
 import { getSetting, setSetting, storageEstimate } from "../storage/db";
 import { LIMITS } from "../engine/parse";
 import { Modal, PageHeader, useToast } from "../components/ui";
+import { aiStatus, type AiStatus } from "../lib/env";
 
 const mb = (b: number) => `${(b / 1048576).toFixed(1)} MB`;
 
 export default function SettingsPage() {
   const { datasets, removeAll } = useDatasets();
   const [usage, setUsage] = useState<{ usage: number; quota: number } | null>(null);
-  const [ai, setAi] = useState<{ available: boolean; provider: string | null } | null>(null);
+  const [ai, setAi] = useState<AiStatus | null>(null);
   const [consent, setConsent] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const toast = useToast();
 
   useEffect(() => {
     void storageEstimate().then(setUsage);
-    fetch("/api/ai/status")
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then(setAi)
-      .catch(() => setAi({ available: false, provider: null }));
+    void aiStatus().then(setAi);
     getSetting("aiConsent", false).then(setConsent).catch(() => undefined);
   }, [datasets]);
 
@@ -59,7 +57,7 @@ export default function SettingsPage() {
           <Sparkles className="h-4 w-4 text-accent" /> AI insights (optional)
         </h2>
         <p className="mt-2 text-sm text-ink-soft">
-          {ai === null ? "Checking…" : ai.available ? `Enabled on this server (${ai.provider}). The API key stays on the server.` : "Not configured on this server. All analysis, charts and reports work without it."}
+          {ai === null ? "Checking…" : ai.available ? `Enabled on this server (${ai.provider}). The API key stays on the server.` : ai.reason === "static" ? "Not available on this public website — it has no server, so nothing you upload can leave your browser. All analysis, charts and reports work without AI." : "Not configured on this server. All analysis, charts and reports work without it."}
         </p>
         <label className="mt-3 flex items-start gap-2 text-sm">
           <input

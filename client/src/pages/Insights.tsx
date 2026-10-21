@@ -7,6 +7,7 @@ import { FilterBar } from "../components/FilterBar";
 import { EMPTY_FILTERS, useView } from "../state/view";
 import { buildFacts } from "../engine/insights";
 import { getSetting, setSetting } from "../storage/db";
+import { aiStatus, BASE, type AiStatus } from "../lib/env";
 import type { Filters } from "../engine/types";
 
 interface AiAnswer {
@@ -28,7 +29,7 @@ function Insights({ record, analysis }: Loaded) {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const { rows, kpiValues, insights } = useView(record, analysis, filters);
   const [open, setOpen] = useState<string | null>(null);
-  const [ai, setAi] = useState<{ available: boolean; provider: string | null } | null>(null);
+  const [ai, setAi] = useState<AiStatus | null>(null);
   const [consent, setConsent] = useState(false);
   const [answer, setAnswer] = useState<AiAnswer | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -36,10 +37,7 @@ function Insights({ record, analysis }: Loaded) {
   const [showFacts, setShowFacts] = useState(false);
 
   useEffect(() => {
-    fetch("/api/ai/status")
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then(setAi)
-      .catch(() => setAi({ available: false, provider: null }));
+    void aiStatus().then(setAi);
     getSetting("aiConsent", false).then(setConsent).catch(() => undefined);
   }, []);
 
@@ -50,7 +48,7 @@ function Insights({ record, analysis }: Loaded) {
     setAiError(null);
     setAnswer(null);
     try {
-      const res = await fetch("/api/ai/insights", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ datasetName: record.name, facts, consent: true }) });
+      const res = await fetch(`${BASE}api/ai/insights`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ datasetName: record.name, facts, consent: true }) });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.error ?? `AI request failed (${res.status}).`);
       setAnswer(body as AiAnswer);
@@ -132,7 +130,13 @@ function Insights({ record, analysis }: Loaded) {
               <p className="mt-3 text-sm text-ink-soft">Checking whether AI is set up…</p>
             ) : !ai.available ? (
               <p className="mt-3 text-sm text-ink-soft">
-                AI isn't configured on this server, which is fine — everything above is computed without it. To enable it, add a free Groq API key to the server's <code className="rounded bg-sunken px-1">.env</code> (see README).
+                {ai.reason === "static" ? (
+                  <>AI is not available on this public website. That is deliberate: the site has no server, so your data never leaves your browser. Everything above is calculated without AI.</>
+                ) : (
+                  <>
+                    AI isn't configured on this server, which is fine — everything above is computed without it. To enable it, add a free Groq API key to the server's <code className="rounded bg-sunken px-1">.env</code> (see README).
+                  </>
+                )}
               </p>
             ) : (
               <div className="mt-3 space-y-3 text-sm">

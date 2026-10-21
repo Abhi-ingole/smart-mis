@@ -13,6 +13,8 @@ It adapts to the data: sales files get revenue and order KPIs, HR files get head
 
 > **Privacy:** files are parsed and stored **in your browser** (IndexedDB). Nothing is uploaded. AI is optional, off by default, and only ever receives computed summary statistics after you tick a consent box.
 
+**Live app:** https://abhi-ingole.github.io/smart-mis/ — free to use. Your files stay in your own browser; the site has no server and no database, so no one (including the site owner) can see what you upload.
+
 ![Dashboard](docs/screenshots/dashboard.png)
 
 ## Quick start
@@ -164,7 +166,19 @@ sudo ufw allow 22,80,443/tcp && sudo ufw enable                  # firewall
 
 **Docker:** `docker compose up -d --build` (listens on 127.0.0.1:4000; put Nginx + HTTPS in front).
 
-Because analysis runs in the browser, the app can also be hosted as a **static site** (`npm run build -w client`, then publish `client/dist` to Netlify/Vercel/GitHub Pages with an SPA fallback to `index.html`). Only the optional AI narrative needs the Node server.
+**GitHub Pages (public, free, no server):**
+
+```bash
+npm run build:pages        # builds client/dist-pages for https://<user>.github.io/smart-mis/
+```
+
+Publish the contents of `client/dist-pages` to the `gh-pages` branch, then in GitHub: *Settings → Pages → Deploy from branch → gh-pages / (root)*. The Pages build:
+
+- has **no backend** — AI is switched off, and uploads physically cannot leave the visitor's browser;
+- embeds a strict Content-Security-Policy (`connect-src 'self'`, `script-src 'self'`) so even injected code couldn't send data elsewhere;
+- includes `404.html` so deep links like `/smart-mis/dashboard/…` work, and `.nojekyll`.
+
+Each visitor's datasets live only in their own browser — visitors never see each other's data. For a different repo name, change `VITE_BASE` in `client/package.json`.
 
 Run `npm audit` before each deploy.
 

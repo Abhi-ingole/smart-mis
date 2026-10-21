@@ -64,7 +64,7 @@ export const DEMO_FILES = [
 
 export async function demoJob(name: string): Promise<Job> {
   const d = DEMO_FILES.find((x) => x.file === name)!;
-  const res = await fetch(`/samples/${d.file}`);
+  const res = await fetch(`${import.meta.env.BASE_URL}samples/${d.file}`);
   if (!res.ok) throw new Error(`Couldn't load the demo file (${res.status}).`);
   const blob = await res.blob();
   const file = new File([blob], d.file, { type: blob.type, lastModified: 1 });

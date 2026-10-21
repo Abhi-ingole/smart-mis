@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:pages": "cross-env VITE_BASE=/smart-mis/ VITE_STATIC=true VITE_OUT_DIR=dist-pages vite build"
   },
   "dependencies": {
     "@e965/xlsx": "0.20.3",
@@ -34,6 +35,7 @@
     "tailwindcss": "^4.3.3",
     "typescript": "~5.9.3",
     "vite": "^8.3.4",
-    "vitest": "^5.0.5"
+    "vitest": "^5.0.5",
+    "cross-env": "^10.0.0"
   }
 }

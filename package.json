@@ -2,7 +2,7 @@
   "name": "smart-mis",
   "version": "2.0.0",
   "private": true,
-  "description": "Smart MIS — upload any Excel or CSV and get automatic dashboards, KPIs, insights and MIS reports",
+  "description": "Smart MIS \u2014 upload any Excel or CSV and get automatic dashboards, KPIs, insights and MIS reports",
   "workspaces": [
     "server",
     "client"
@@ -14,7 +14,8 @@
     "start": "npm run start -w server",
     "test": "npm test -w client && npm test -w server",
     "typecheck": "npm run typecheck -w server && npm run typecheck -w client",
-    "samples": "node scripts/make-samples.mjs"
+    "samples": "node scripts/make-samples.mjs",
+    "build:pages": "npm run build:pages -w client"
   },
   "devDependencies": {
     "concurrently": "^10.0.6"

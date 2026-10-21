@@ -35,7 +35,7 @@ function Builder({ record, analysis }: Loaded) {
     [record, title, analysis, rows, kpiValues, insights, filtersNote, appendixRows],
   );
   const on = (id: SectionId) => include.has(id);
-  const fileBase = model.title.replace(/[^\w\- ]+/g, "").trim() || "MIS report";
+  const fileBase = model.title.replace(/[^\w\- ]+/g, " ").replace(/\s+/g, " ").trim() || "MIS report";
 
   const exportPdf = async () => {
     setBusy("pdf");
