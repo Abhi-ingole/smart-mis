@@ -13,7 +13,8 @@ export function fmtNumber(n: number | null | undefined, maxFrac?: number): strin
 
 export function fmtPercent(n: number | null | undefined, frac = 1): string {
   if (n === null || n === undefined || !Number.isFinite(n)) return "—";
-  return `${n.toFixed(frac)}%`;
+  const f = n !== 0 && Math.abs(n) < 0.1 ? 2 : frac;
+  return `${n.toFixed(f)}%`;
 }
 
 /** Only shows a currency symbol when the data itself had one — never invents ₹ or $. */

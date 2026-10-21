@@ -17,7 +17,7 @@ const HINT = {
 
 const SEMANTIC_RULES: [Semantic, RegExp][] = [
   ["profit", /profit|margin\s*amount|earnings|net\s*income/i],
-  ["revenue", /revenue|sales\s*(amount|value)?$|^sales$|turnover|gmv|income|amount|invoice\s*value|order\s*value|billing/i],
+  ["revenue", /revenue|sales\s*(amount|value)?|^sales$|turnover|gmv|income|(invoice|order|bill(ing)?|sale)\s*(amount|value)/i],
   ["cost", /cost|expense|spend|expenditure|purchase\s*value/i],
   ["salary", /salary|ctc|wage|pay\b|compensation|stipend/i],
   ["price", /price|mrp|rate\b|unit\s*cost/i],

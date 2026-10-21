@@ -31,8 +31,8 @@ export function tableCsv(table: Table, rows: number[]): string {
   );
 }
 
-export function download(name: string, data: BlobPart, type: string) {
-  const blob = new Blob([data], { type });
+export function download(name: string, data: BlobPart | Uint8Array, type: string) {
+  const blob = new Blob([data as BlobPart], { type });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -109,7 +109,8 @@ export function reportWorkbook(model: ReportModel, table: Table, rows: number[])
 const WINANSI_EXTRA = new Set("€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ");
 export function pdfText(s: string): string {
   return s
-    .replace(/₹\s?/g, "Rs. ")
+    .replace(/₹\s?(?=[\d-])/g, "Rs. ")
+    .replace(/₹/g, "Rs")
     .replace(/≥/g, ">=")
     .replace(/≤/g, "<=")
     .replace(/[^\x00-\xff]/g, (ch) => (WINANSI_EXTRA.has(ch) ? ch : "?"));
@@ -135,7 +136,7 @@ export async function reportPdf(model: ReportModel, chartImages: { title: string
     }
   };
   const heading = (t: string) => {
-    ensure(40);
+    ensure(90);
     y += 8;
     doc.setFont("helvetica", "bold").setFontSize(13).setTextColor(...ink).text(pdfText(t), M, y);
     y += 6;
@@ -200,7 +201,7 @@ export async function reportPdf(model: ReportModel, chartImages: { title: string
       ensure(h + 24);
       doc.setFont("helvetica", "bold").setFontSize(10).setTextColor(...ink).text(pdfText(img.title), M, y);
       y += 8;
-      doc.addImage(img.png, "PNG", M, y, w, h);
+      doc.addImage(img.png, img.png.startsWith("data:image/jpeg") ? "JPEG" : "PNG", M, y, w, h, undefined, "FAST");
       y += h + 16;
     }
   }

@@ -37,6 +37,8 @@ describe("Test A — sales workbook", () => {
     expect(types).toContain("bar");
     const date = rec.schema.find((c) => c.name === "Order Date")!;
     expect(date.type).toBe("date");
+    // Excel dates stay calendar dates whatever the computer's time zone is
+    expect(rec.rows.every((r) => typeof r[date.index] === "string" && /^\d{4}-\d{2}-\d{2}$/.test(r[date.index] as string))).toBe(true);
     expect(rec.schema.find((c) => c.name === "Order ID")!.role).toBe("identifier");
     // A comparison only exists because there are dates
     expect(rev.comparison?.label).toMatch(/vs/);

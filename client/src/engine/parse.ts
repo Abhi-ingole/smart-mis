@@ -43,10 +43,12 @@ function cellToValue(v: unknown): Cell {
   if (v === null || v === undefined) return null;
   if (v instanceof Date) {
     if (isNaN(v.getTime())) return null;
+    // Dates are read as UTC (see sheet_to_json UTC option); round to the minute to drop float noise.
+    const t = new Date(Math.round(v.getTime() / 60000) * 60000);
     const pad = (n: number) => String(n).padStart(2, "0");
-    const d = `${v.getFullYear()}-${pad(v.getMonth() + 1)}-${pad(v.getDate())}`;
-    const hasTime = v.getHours() || v.getMinutes() || v.getSeconds();
-    return hasTime ? `${d}T${pad(v.getHours())}:${pad(v.getMinutes())}` : d;
+    const d = `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}`;
+    const hasTime = t.getUTCHours() || t.getUTCMinutes();
+    return hasTime ? `${d}T${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}` : d;
   }
   if (typeof v === "number") return Number.isFinite(v) ? v : null;
   if (typeof v === "boolean") return v;
@@ -144,14 +146,14 @@ export function parseCsvText(text: string, name = "Sheet1"): RawSheet {
 export function parseWorkbook(data: ArrayBuffer | Uint8Array): RawSheet[] {
   let wb: XLSX.WorkBook;
   try {
-    wb = XLSX.read(data, { type: "array", cellDates: true, dense: true, sheetRows: LIMITS.maxRows + 25 });
+    wb = XLSX.read(data, { type: "array", cellDates: true, dense: true, UTC: true, sheetRows: LIMITS.maxRows + 25 });
   } catch (e) {
     throw new ParseError(`Couldn't open this workbook: ${(e as Error).message}. If it's password-protected, remove the password and try again.`);
   }
   if (!wb.SheetNames.length) throw new ParseError("This workbook has no sheets.");
   return wb.SheetNames.map((sheetName) => {
     const ws = wb.Sheets[sheetName];
-    const matrix = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: true, defval: null, blankrows: false }).map((r) => (r as unknown[]).map(cellToValue));
+    const matrix = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: true, defval: null, blankrows: false, UTC: true }).map((r) => (r as unknown[]).map(cellToValue));
     return buildSheet(sheetName, matrix);
   });
 }

@@ -87,7 +87,11 @@ export function generateInsights(table: Table, rows: number[], profiles: Record<
   }
 
   // 2. Top / bottom categories and concentration
-  for (const d of dims.slice(0, 2)) {
+  const PREF = ["region", "category", "product", "department", "subject", "status", "result", "payment", "gender"];
+  const rankedDims = dims
+    .filter((d) => (profiles[d.key]?.distinct ?? 0) <= 30)
+    .sort((a, b) => (PREF.includes(b.semantic) ? 1 : 0) - (PREF.includes(a.semantic) ? 1 : 0) || (profiles[a.key]?.distinct ?? 0) - (profiles[b.key]?.distinct ?? 0));
+  for (const d of rankedDims.slice(0, 2)) {
     const useSum = primary && defaultAgg(primary) === "sum";
     const groups = groupBy(table, rows, d.key, useSum ? primary!.key : undefined, useSum ? "sum" : "count").filter((g) => g.key !== "(blank)");
     if (groups.length < 2) continue;

@@ -1,40 +1,38 @@
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { lazy, Suspense, type ReactNode } from "react";
-import { AuthProvider, useAuth } from "./lib/auth";
+import { lazy, Suspense } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
-import { Spinner } from "./components/ui";
-import LoginPage from "./pages/Login";
-import ChangePasswordPage from "./pages/ChangePassword";
-const DashboardPage = lazy(() => import("./pages/Dashboard"));
-const AddDataPage = lazy(() => import("./pages/AddData"));
-const ReportsPage = lazy(() => import("./pages/Reports"));
-const SettingsPage = lazy(() => import("./pages/Settings"));
+import { SkeletonDashboard, ToastProvider } from "./components/ui";
+import { DatasetsProvider } from "./state/datasets";
+import OverviewPage from "./pages/Overview";
 
-function Protected({ children, need }: { children: ReactNode; need?: "edit" | "admin" }) {
-  const { user, loading, can } = useAuth();
-  const loc = useLocation();
-  if (loading) return <Spinner />;
-  if (!user) return <Navigate to="/login" state={{ from: loc.pathname }} replace />;
-  if (need && !can(need)) return <Navigate to="/" replace />;
-  return (
-    <Layout>
-      <Suspense fallback={<Spinner />}>{children}</Suspense>
-    </Layout>
-  );
-}
+const UploadPage = lazy(() => import("./pages/Upload"));
+const DatasetsPage = lazy(() => import("./pages/Datasets"));
+const DashboardPage = lazy(() => import("./pages/Dashboard"));
+const ReportPage = lazy(() => import("./pages/ReportBuilder"));
+const InsightsPage = lazy(() => import("./pages/Insights"));
+const QualityPage = lazy(() => import("./pages/DataQuality"));
+const SettingsPage = lazy(() => import("./pages/Settings"));
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<Protected><DashboardPage /></Protected>} />
-        <Route path="/add" element={<Protected need="edit"><AddDataPage /></Protected>} />
-        <Route path="/reports" element={<Protected><ReportsPage /></Protected>} />
-        <Route path="/settings" element={<Protected need="admin"><SettingsPage /></Protected>} />
-        <Route path="/password" element={<Protected><ChangePasswordPage /></Protected>} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </AuthProvider>
+    <ToastProvider>
+      <DatasetsProvider>
+        <Layout>
+          <Suspense fallback={<SkeletonDashboard />}>
+            <Routes>
+              <Route path="/" element={<OverviewPage />} />
+              <Route path="/upload" element={<UploadPage />} />
+              <Route path="/datasets" element={<DatasetsPage />} />
+              <Route path="/dashboard/:id?" element={<DashboardPage />} />
+              <Route path="/report/:id?" element={<ReportPage />} />
+              <Route path="/insights/:id?" element={<InsightsPage />} />
+              <Route path="/quality/:id?" element={<QualityPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </Layout>
+      </DatasetsProvider>
+    </ToastProvider>
   );
 }

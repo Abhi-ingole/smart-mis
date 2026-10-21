@@ -5,31 +5,45 @@
 @import "tailwindcss";
 
 /*
-  Smart MIS design tokens.
-  Two channels, two colours, used consistently everywhere:
-  WhatsApp = leaf green, Email = indigo. Everything else stays neutral ink.
+  Smart MIS design tokens — light, calm surfaces with one confident indigo accent.
+  Column types have their own colours (the "type fingerprint"), used consistently
+  in dataset cards, the column list and the mapping table.
 */
 @theme {
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
 
-  --color-ink: #17202e;
-  --color-ink-soft: #4a5568;
-  --color-ink-faint: #8792a2;
-  --color-line: #dfe4ea;
-  --color-canvas: #f3f5f8;
-  --color-panel: #ffffff;
-  --color-rail: #1b2536;
+  --color-canvas: #f4f6fb;
+  --color-surface: #ffffff;
+  --color-sunken: #f8f9fc;
+  --color-ink: #141a2e;
+  --color-ink-soft: #566074;
+  --color-ink-faint: #8a93a6;
+  --color-line: #e3e7ef;
+  --color-line-strong: #cfd5e1;
 
-  --color-wa: #1f8a5b;
-  --color-wa-soft: #e5f4ec;
-  --color-mail: #4b57d1;
-  --color-mail-soft: #ebedfb;
+  --color-accent: #3b4fd8;
+  --color-accent-strong: #2f3fb8;
+  --color-accent-soft: #eef0fd;
 
-  --color-up: #1f7a4d;
-  --color-down: #c0392b;
-  --color-warn: #a86414;
-  --color-warn-soft: #fdf3e3;
+  --color-good: #15865a;
+  --color-good-soft: #e7f5ee;
+  --color-warn: #a96200;
+  --color-warn-soft: #fdf4e3;
+  --color-bad: #c2362f;
   --color-bad-soft: #fcecea;
+
+  /* column type colours */
+  --color-t-number: #3b4fd8;
+  --color-t-currency: #15865a;
+  --color-t-percentage: #0e8fa0;
+  --color-t-date: #b0610f;
+  --color-t-category: #8b45c7;
+  --color-t-boolean: #c94a6b;
+  --color-t-text: #8a93a6;
+  --color-t-identifier: #4a5568;
+
+  --shadow-card: 0 1px 2px rgba(20, 26, 46, 0.05), 0 6px 20px -8px rgba(20, 26, 46, 0.08);
+  --shadow-pop: 0 12px 40px -12px rgba(20, 26, 46, 0.28);
 }
 
 @layer base {
@@ -44,7 +58,7 @@
     line-height: 1.5;
   }
   :focus-visible {
-    outline: 2px solid var(--color-mail);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
   @media (prefers-reduced-motion: reduce) {
@@ -58,38 +72,75 @@
 }
 
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-md px-3.5 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
 }
 
 @layer components {
+  .card {
+    @apply rounded-xl border border-line bg-surface;
+    box-shadow: var(--shadow-card);
+  }
   .input {
-    @apply w-full rounded-md border border-line bg-white px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-mail focus:outline-none focus:ring-2 focus:ring-mail/20 disabled:bg-canvas disabled:text-ink-faint;
+    @apply w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 disabled:bg-sunken disabled:text-ink-faint;
   }
   .label {
     @apply mb-1 block text-sm font-medium text-ink-soft;
   }
-  .panel {
-    @apply rounded-lg border border-line bg-panel;
-  }
   .btn-primary {
-    @apply btn bg-ink text-white hover:bg-ink/85;
+    @apply btn bg-accent text-white shadow-sm hover:bg-accent-strong;
   }
   .btn-secondary {
-    @apply btn border border-line bg-white text-ink hover:bg-canvas;
+    @apply btn border border-line bg-white text-ink hover:border-line-strong hover:bg-sunken;
   }
   .btn-ghost {
-    @apply btn text-ink-soft hover:bg-canvas hover:text-ink;
+    @apply btn text-ink-soft hover:bg-sunken hover:text-ink;
   }
   .btn-danger {
-    @apply btn border border-down/30 bg-white text-down hover:bg-bad-soft;
+    @apply btn border border-bad/30 bg-white text-bad hover:bg-bad-soft;
   }
   .table {
     @apply w-full text-left text-sm;
   }
   .table th {
-    @apply border-b border-line px-3 py-2 font-medium text-ink-soft;
+    @apply sticky top-0 border-b border-line bg-sunken px-3 py-2 text-xs font-semibold text-ink-soft;
   }
   .table td {
-    @apply border-b border-line px-3 py-2;
+    @apply border-b border-line px-3 py-2 align-top;
   }
+  .skeleton {
+    @apply animate-pulse rounded-md bg-line/70;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .print-page {
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+  .print-break {
+    break-before: page;
+  }
+  .print-avoid {
+    break-inside: avoid;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-rise {
+  animation: rise 0.35s ease-out both;
 }
