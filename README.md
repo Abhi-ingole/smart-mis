@@ -131,7 +131,7 @@ scripts/make-samples.mjs
 
 ### What changed from the previous version
 
-The first version (kept in git tag **`v1-campaign-mis`**) was a WhatsApp/Email campaign MIS with a fixed data model (WA sent, delivered, emails opened), SQLite/Prisma, login and a daily e-mail scheduler.
+The first version (kept on the branch **`v1-campaign-mis`**) was a WhatsApp/Email campaign MIS with a fixed data model (WA sent, delivered, emails opened), SQLite/Prisma, login and a daily e-mail scheduler.
 
 - **Kept / reused:** React + Vite + Tailwind + Recharts front end, Express server with Helmet/CORS/rate-limit/zod validation, the Groq client with model fallback and the "every AI number must be grounded" check, formula-safe CSV export, html-to-image + jsPDF exporting.
 - **Replaced:** the fixed WhatsApp/Email tables, KPIs, dashboard and report with the universal engine above; server-side storage with local-first IndexedDB (no database, no native modules — installs cleanly on Windows); `exceljs` with SheetJS (reads .xls and many sheets).
