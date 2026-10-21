@@ -29,7 +29,7 @@ function write(file, data) {
 }
 function writeXlsx(file, sheets) {
   const wb = XLSX.utils.book_new();
-  for (const [sheetName, aoa] of sheets) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa, { cellDates: true }), sheetName);
+  for (const [sheetName, aoa] of sheets) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa, { cellDates: true, UTC: true }), sheetName);
   write(file, XLSX.write(wb, { type: "buffer", bookType: "xlsx", cellDates: true }));
 }
 const csv = (aoa) => aoa.map((r) => r.map((v) => (v === null || v === undefined ? "" : /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v))).join(",")).join("\n") + "\n";
