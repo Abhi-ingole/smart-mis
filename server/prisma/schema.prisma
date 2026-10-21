@@ -1,0 +1,177 @@
+// Smart MIS — database schema
+// SQLite today; to move to Postgres change `provider` to "postgresql",
+// swap the driver adapter in src/lib/db.ts for @prisma/adapter-pg and
+// run `npx prisma migrate dev` to create a Postgres migration.
+// Every business table carries company_id and every query is scoped by it.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Company {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users        User[]
+  dailyMetrics DailyMetric[]
+  targets      Target[]
+  holidays     Holiday[]
+  reports      Report[]
+  settings     Setting[]
+  auditLogs    AuditLog[]
+  uploads      Upload[]
+
+  @@map("companies")
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  companyId      Int       @map("company_id")
+  name           String
+  email          String    @unique
+  passwordHash   String    @map("password_hash")
+  role           String    @default("member") // admin | member | viewer
+  active         Boolean   @default(true)
+  failedAttempts Int       @default(0) @map("failed_attempts")
+  lockedUntil    DateTime? @map("locked_until")
+  tokenVersion   Int       @default(0) @map("token_version")
+  lastLoginAt    DateTime? @map("last_login_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@map("users")
+}
+
+model DailyMetric {
+  id                 Int      @id @default(autoincrement())
+  companyId          Int      @map("company_id")
+  reportDate         String   @map("report_date") // YYYY-MM-DD (company time zone)
+  campaign           String
+  waRecipients       Int      @default(0) @map("wa_recipients")
+  waDelivered        Int      @default(0) @map("wa_delivered")
+  emailSent          Int      @default(0) @map("email_sent")
+  emailOpened        Int      @default(0) @map("email_opened")
+  notes              String?
+  waSourceFile       String?  @map("wa_source_file")
+  emailSourceFile    String?  @map("email_source_file")
+  waExtractedJson    String?  @map("wa_extracted_json")
+  emailExtractedJson String?  @map("email_extracted_json")
+  createdBy          Int?     @map("created_by")
+  updatedBy          Int?     @map("updated_by")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, reportDate, campaign])
+  @@index([companyId, reportDate])
+  @@map("daily_metrics")
+}
+
+model Target {
+  id           Int      @id @default(autoincrement())
+  companyId    Int      @map("company_id")
+  month        String // YYYY-MM
+  waRecipients Int      @default(0) @map("wa_recipients")
+  waDelivered  Int      @default(0) @map("wa_delivered")
+  emailSent    Int      @default(0) @map("email_sent")
+  emailOpened  Int      @default(0) @map("email_opened")
+  deliveryPct  Float    @default(0) @map("delivery_pct")
+  openPct      Float    @default(0) @map("open_pct")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, month])
+  @@map("targets")
+}
+
+model Holiday {
+  id        Int      @id @default(autoincrement())
+  companyId Int      @map("company_id")
+  date      String // YYYY-MM-DD
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, date])
+  @@map("holidays")
+}
+
+model Report {
+  id           Int      @id @default(autoincrement())
+  companyId    Int      @map("company_id")
+  reportDate   String   @map("report_date")
+  kind         String // manual | auto
+  kpisJson     String   @map("kpis_json")
+  summary      String
+  whatsappText String   @map("whatsapp_text")
+  sentVia      String?  @map("sent_via")
+  sentTo       String?  @map("sent_to")
+  createdBy    Int?     @map("created_by")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, reportDate])
+  @@map("reports")
+}
+
+model Setting {
+  id        Int      @id @default(autoincrement())
+  companyId Int      @map("company_id")
+  key       String
+  value     String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, key])
+  @@map("settings")
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  companyId   Int?     @map("company_id")
+  userId      Int?     @map("user_id")
+  action      String
+  entity      String
+  entityId    String?  @map("entity_id")
+  detailsJson String?  @map("details_json")
+  ip          String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, createdAt])
+  @@map("audit_log")
+}
+
+model Upload {
+  id           Int      @id @default(autoincrement())
+  companyId    Int      @map("company_id")
+  storedName   String   @unique @map("stored_name")
+  originalName String   @map("original_name")
+  mimeType     String   @map("mime_type")
+  sizeBytes    Int      @map("size_bytes")
+  createdBy    Int?     @map("created_by")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@map("uploads")
+}
