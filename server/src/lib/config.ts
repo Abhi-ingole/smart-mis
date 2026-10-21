@@ -50,6 +50,8 @@ export const config = {
     phoneNumberId: env.WA_CLOUD_PHONE_NUMBER_ID ?? "",
     apiVersion: env.WA_CLOUD_API_VERSION ?? "v21.0",
   },
+  /** Secure (HTTPS-only) cookies. Defaults to on in production. */
+  cookieSecure: env.COOKIE_SECURE ? env.COOKIE_SECURE.toLowerCase() === "true" : nodeEnv === "production",
   enableCron: (env.ENABLE_CRON ?? "true").toLowerCase() === "true",
   maxUploadBytes: 10 * 1024 * 1024,
 };

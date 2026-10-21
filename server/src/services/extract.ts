@@ -178,7 +178,8 @@ export function tableToText(t: Table): string {
   const clean = dropPiiColumns(t);
   if (clean.headers.length === 0) return "";
   // Key/value style (2 columns)
-  if (clean.headers.length === 2 && clean.rows.length > 0) {
+  const labelRows = clean.rows.length > 0 && clean.rows.every((r) => !/^\d[\d,]*$/.test((r[0] ?? "").trim()));
+  if (clean.headers.length === 2 && labelRows) {
     return [clean.headers.join(": "), ...clean.rows.map((r) => `${r[0]}: ${r[1]}`)].join("\n");
   }
   // Column style: total each numeric column

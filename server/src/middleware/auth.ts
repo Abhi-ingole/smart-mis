@@ -30,7 +30,7 @@ export const CSRF_HEADER = "x-csrf-token";
 const SESSION_HOURS = 8;
 
 function cookieBase(): CookieOptions {
-  return { sameSite: "strict", secure: config.isProd, path: "/" };
+  return { sameSite: "strict", secure: config.cookieSecure, path: "/" };
 }
 
 export function setSessionCookie(res: Response, user: { id: number; companyId: number; tokenVersion: number }) {

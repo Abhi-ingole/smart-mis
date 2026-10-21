@@ -19,6 +19,6 @@ function makeClient(): PrismaClient {
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 export const prisma: PrismaClient = globalForPrisma.prisma ?? makeClient();
-if (!config.isProd) globalForPrisma.prisma = prisma;
+if (!config.isProd && !config.isTest) globalForPrisma.prisma = prisma;
 
 export type { PrismaClient };
