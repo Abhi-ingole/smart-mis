@@ -42,12 +42,3 @@ export function validate(schemas: Schemas = {}): RequestHandler {
     next();
   };
 }
-
-// ── Reusable field schemas ──────────────────────────────────
-export const idParam = z.object({ id: z.coerce.number().int().positive() });
-export const dateStr = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD");
-export const monthStr = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Use YYYY-MM");
-export const timeStr = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use HH:MM (24h)");
-export const count = z.coerce.number().int("Must be a whole number").min(0, "Cannot be negative").max(100_000_000);
-export const password = z.string().min(8, "Password must be at least 8 characters").max(200);
-export const email = z.string().trim().toLowerCase().pipe(z.email("Invalid email")).pipe(z.string().max(200));

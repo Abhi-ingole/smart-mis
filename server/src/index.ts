@@ -1,24 +1,11 @@
-import { assertSafeConfig, config } from "./lib/config";
-
-try {
-  assertSafeConfig();
-} catch (e) {
-  console.error(`[startup] ${(e as Error).message}`);
-  process.exit(1);
-}
-
-import { runMigrations } from "./scripts/migrate";
+import { config, isAiAvailable } from "./lib/config";
 import { createApp } from "./app";
-import { startJobs } from "./jobs/scheduler";
-
-runMigrations(undefined, !config.isTest);
 
 const app = createApp();
 const server = app.listen(config.port, () => {
-  console.log(`[server] Smart MIS API listening on http://localhost:${config.port} (${config.nodeEnv})`);
+  console.log(`[server] Smart MIS listening on http://localhost:${config.port} (${config.nodeEnv})`);
+  console.log(`[server] AI insights: ${isAiAvailable() ? "enabled (Groq)" : "off — add GROQ_API_KEY to .env to enable"}`);
 });
-
-if (config.enableCron) startJobs();
 
 function shutdown() {
   server.close(() => process.exit(0));

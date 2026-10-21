@@ -1,29 +1,25 @@
 {
   "name": "smart-mis",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "Smart MIS \u2014 automated daily MIS reports for WhatsApp and email campaigns",
+  "description": "Smart MIS — upload any Excel or CSV and get automatic dashboards, KPIs, insights and MIS reports",
   "workspaces": [
     "server",
     "client"
   ],
   "scripts": {
     "dev": "concurrently -n server,client -c blue,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
+    "dev:client": "npm run dev -w client",
     "build": "npm run build -w client && npm run build -w server",
     "start": "npm run start -w server",
-    "seed": "npm run seed -w server",
-    "migrate": "npm run migrate -w server",
-    "test": "npm test -w server",
+    "test": "npm test -w client && npm test -w server",
     "typecheck": "npm run typecheck -w server && npm run typecheck -w client",
-    "create-admin": "npm run create-admin -w server --"
+    "samples": "node scripts/make-samples.mjs"
   },
   "devDependencies": {
     "concurrently": "^10.0.6"
   },
   "engines": {
     "node": ">=20.19"
-  },
-  "overrides": {
-    "uuid": "^11.1.1"
   }
 }

@@ -1,0 +1,301 @@
+Roll No,Student Name,Class,Gender,Subject,Marks Obtained,Result
+R001,Reyansh Mehta,10-B,Female,Mathematics,66,Pass
+R001,Reyansh Mehta,10-B,Female,Science,33,Fail
+R001,Reyansh Mehta,10-B,Female,English,28,Fail
+R001,Reyansh Mehta,10-B,Female,History,37,Pass
+R001,Reyansh Mehta,10-B,Female,Computer Science,32,Fail
+R002,Tara Nair,10-C,Female,Mathematics,63,Pass
+R002,Tara Nair,10-C,Female,Science,67,Pass
+R002,Tara Nair,10-C,Female,English,68,Pass
+R002,Tara Nair,10-C,Female,History,82,Pass
+R002,Tara Nair,10-C,Female,Computer Science,83,Pass
+R003,Reyansh Khan,10-B,Female,Mathematics,95,Pass
+R003,Reyansh Khan,10-B,Female,Science,77,Pass
+R003,Reyansh Khan,10-B,Female,English,87,Pass
+R003,Reyansh Khan,10-B,Female,History,63,Pass
+R003,Reyansh Khan,10-B,Female,Computer Science,80,Pass
+R004,Kabir Mehta,10-B,Female,Mathematics,49,Pass
+R004,Kabir Mehta,10-B,Female,Science,49,Pass
+R004,Kabir Mehta,10-B,Female,English,37,Pass
+R004,Kabir Mehta,10-B,Female,History,61,Pass
+R004,Kabir Mehta,10-B,Female,Computer Science,53,Pass
+R005,Ananya Kulkarni,10-B,Male,Mathematics,59,Pass
+R005,Ananya Kulkarni,10-B,Male,Science,54,Pass
+R005,Ananya Kulkarni,10-B,Male,English,39,Pass
+R005,Ananya Kulkarni,10-B,Male,History,37,Pass
+R005,Ananya Kulkarni,10-B,Male,Computer Science,38,Pass
+R006,Ananya Iyer,10-B,Male,Mathematics,60,Pass
+R006,Ananya Iyer,10-B,Male,Science,37,Pass
+R006,Ananya Iyer,10-B,Male,English,75,Pass
+R006,Ananya Iyer,10-B,Male,History,45,Pass
+R006,Ananya Iyer,10-B,Male,Computer Science,42,Pass
+R007,Reyansh Patil,10-B,Female,Mathematics,61,Pass
+R007,Reyansh Patil,10-B,Female,Science,87,Pass
+R007,Reyansh Patil,10-B,Female,English,62,Pass
+R007,Reyansh Patil,10-B,Female,History,55,Pass
+R007,Reyansh Patil,10-B,Female,Computer Science,54,Pass
+R008,Myra Nair,10-B,Male,Mathematics,68,Pass
+R008,Myra Nair,10-B,Male,Science,69,Pass
+R008,Myra Nair,10-B,Male,English,49,Pass
+R008,Myra Nair,10-B,Male,History,75,Pass
+R008,Myra Nair,10-B,Male,Computer Science,73,Pass
+R009,Tara Pillai,10-C,Female,Mathematics,43,Pass
+R009,Tara Pillai,10-C,Female,Science,37,Pass
+R009,Tara Pillai,10-C,Female,English,48,Pass
+R009,Tara Pillai,10-C,Female,History,59,Pass
+R009,Tara Pillai,10-C,Female,Computer Science,49,Pass
+R010,Meera Mehta,10-B,Male,Mathematics,60,Pass
+R010,Meera Mehta,10-B,Male,Science,58,Pass
+R010,Meera Mehta,10-B,Male,English,81,Pass
+R010,Meera Mehta,10-B,Male,History,69,Pass
+R010,Meera Mehta,10-B,Male,Computer Science,59,Pass
+R011,Aarav Desai,10-C,Female,Mathematics,50,Pass
+R011,Aarav Desai,10-C,Female,Science,73,Pass
+R011,Aarav Desai,10-C,Female,English,37,Pass
+R011,Aarav Desai,10-C,Female,History,35,Pass
+R011,Aarav Desai,10-C,Female,Computer Science,57,Pass
+R012,Meera Sharma,10-A,Male,Mathematics,56,Pass
+R012,Meera Sharma,10-A,Male,Science,54,Pass
+R012,Meera Sharma,10-A,Male,English,63,Pass
+R012,Meera Sharma,10-A,Male,History,69,Pass
+R012,Meera Sharma,10-A,Male,Computer Science,68,Pass
+R013,Ananya Khan,10-A,Female,Mathematics,69,Pass
+R013,Ananya Khan,10-A,Female,Science,86,Pass
+R013,Ananya Khan,10-A,Female,English,81,Pass
+R013,Ananya Khan,10-A,Female,History,66,Pass
+R013,Ananya Khan,10-A,Female,Computer Science,78,Pass
+R014,Neel Rao,10-A,Female,Mathematics,69,Pass
+R014,Neel Rao,10-A,Female,Science,92,Pass
+R014,Neel Rao,10-A,Female,English,90,Pass
+R014,Neel Rao,10-A,Female,History,94,Pass
+R014,Neel Rao,10-A,Female,Computer Science,59,Pass
+R015,Myra Rao,10-C,Female,Mathematics,35,Pass
+R015,Myra Rao,10-C,Female,Science,53,Pass
+R015,Myra Rao,10-C,Female,English,47,Pass
+R015,Myra Rao,10-C,Female,History,46,Pass
+R015,Myra Rao,10-C,Female,Computer Science,60,Pass
+R016,Neel Khan,10-A,Male,Mathematics,46,Pass
+R016,Neel Khan,10-A,Male,Science,35,Pass
+R016,Neel Khan,10-A,Male,English,67,Pass
+R016,Neel Khan,10-A,Male,History,65,Pass
+R016,Neel Khan,10-A,Male,Computer Science,69,Pass
+R017,Saanvi Sharma,10-B,Female,Mathematics,89,Pass
+R017,Saanvi Sharma,10-B,Female,Science,74,Pass
+R017,Saanvi Sharma,10-B,Female,English,59,Pass
+R017,Saanvi Sharma,10-B,Female,History,62,Pass
+R017,Saanvi Sharma,10-B,Female,Computer Science,53,Pass
+R018,Rohan Desai,10-A,Male,Mathematics,52,Pass
+R018,Rohan Desai,10-A,Male,Science,64,Pass
+R018,Rohan Desai,10-A,Male,English,68,Pass
+R018,Rohan Desai,10-A,Male,History,81,Pass
+R018,Rohan Desai,10-A,Male,Computer Science,62,Pass
+R019,Rohan Iyer,10-A,Male,Mathematics,38,Pass
+R019,Rohan Iyer,10-A,Male,Science,42,Pass
+R019,Rohan Iyer,10-A,Male,English,42,Pass
+R019,Rohan Iyer,10-A,Male,History,29,Fail
+R019,Rohan Iyer,10-A,Male,Computer Science,31,Fail
+R020,Arjun Gupta,10-C,Female,Mathematics,52,Pass
+R020,Arjun Gupta,10-C,Female,Science,54,Pass
+R020,Arjun Gupta,10-C,Female,English,65,Pass
+R020,Arjun Gupta,10-C,Female,History,64,Pass
+R020,Arjun Gupta,10-C,Female,Computer Science,70,Pass
+R021,Riya Iyer,10-B,Female,Mathematics,73,Pass
+R021,Riya Iyer,10-B,Female,Science,90,Pass
+R021,Riya Iyer,10-B,Female,English,85,Pass
+R021,Riya Iyer,10-B,Female,History,83,Pass
+R021,Riya Iyer,10-B,Female,Computer Science,61,Pass
+R022,Rohan Desai,10-B,Female,Mathematics,71,Pass
+R022,Rohan Desai,10-B,Female,Science,47,Pass
+R022,Rohan Desai,10-B,Female,English,57,Pass
+R022,Rohan Desai,10-B,Female,History,54,Pass
+R022,Rohan Desai,10-B,Female,Computer Science,67,Pass
+R023,Isha Joshi,10-A,Male,Mathematics,78,Pass
+R023,Isha Joshi,10-A,Male,Science,65,Pass
+R023,Isha Joshi,10-A,Male,English,58,Pass
+R023,Isha Joshi,10-A,Male,History,66,Pass
+R023,Isha Joshi,10-A,Male,Computer Science,76,Pass
+R024,Arjun Sharma,10-A,Male,Mathematics,54,Pass
+R024,Arjun Sharma,10-A,Male,Science,62,Pass
+R024,Arjun Sharma,10-A,Male,English,55,Pass
+R024,Arjun Sharma,10-A,Male,History,67,Pass
+R024,Arjun Sharma,10-A,Male,Computer Science,56,Pass
+R025,Aditya Joshi,10-A,Female,Mathematics,72,Pass
+R025,Aditya Joshi,10-A,Female,Science,58,Pass
+R025,Aditya Joshi,10-A,Female,English,60,Pass
+R025,Aditya Joshi,10-A,Female,History,54,Pass
+R025,Aditya Joshi,10-A,Female,Computer Science,55,Pass
+R026,Ishaan Joshi,10-B,Male,Mathematics,80,Pass
+R026,Ishaan Joshi,10-B,Male,Science,98,Pass
+R026,Ishaan Joshi,10-B,Male,English,84,Pass
+R026,Ishaan Joshi,10-B,Male,History,64,Pass
+R026,Ishaan Joshi,10-B,Male,Computer Science,95,Pass
+R027,Rohan Khan,10-B,Male,Mathematics,53,Pass
+R027,Rohan Khan,10-B,Male,Science,61,Pass
+R027,Rohan Khan,10-B,Male,English,59,Pass
+R027,Rohan Khan,10-B,Male,History,53,Pass
+R027,Rohan Khan,10-B,Male,Computer Science,64,Pass
+R028,Ishaan Kulkarni,10-A,Male,Mathematics,86,Pass
+R028,Ishaan Kulkarni,10-A,Male,Science,50,Pass
+R028,Ishaan Kulkarni,10-A,Male,English,73,Pass
+R028,Ishaan Kulkarni,10-A,Male,History,51,Pass
+R028,Ishaan Kulkarni,10-A,Male,Computer Science,77,Pass
+R029,Aditya Kulkarni,10-A,Female,Mathematics,43,Pass
+R029,Aditya Kulkarni,10-A,Female,Science,44,Pass
+R029,Aditya Kulkarni,10-A,Female,English,35,Pass
+R029,Aditya Kulkarni,10-A,Female,History,30,Fail
+R029,Aditya Kulkarni,10-A,Female,Computer Science,45,Pass
+R030,Neel Desai,10-A,Female,Mathematics,55,Pass
+R030,Neel Desai,10-A,Female,Science,60,Pass
+R030,Neel Desai,10-A,Female,English,68,Pass
+R030,Neel Desai,10-A,Female,History,45,Pass
+R030,Neel Desai,10-A,Female,Computer Science,62,Pass
+R031,Ananya Kulkarni,10-A,Male,Mathematics,44,Pass
+R031,Ananya Kulkarni,10-A,Male,Science,67,Pass
+R031,Ananya Kulkarni,10-A,Male,English,56,Pass
+R031,Ananya Kulkarni,10-A,Male,History,70,Pass
+R031,Ananya Kulkarni,10-A,Male,Computer Science,75,Pass
+R032,Vivaan Sharma,10-A,Female,Mathematics,86,Pass
+R032,Vivaan Sharma,10-A,Female,Science,79,Pass
+R032,Vivaan Sharma,10-A,Female,English,78,Pass
+R032,Vivaan Sharma,10-A,Female,History,77,Pass
+R032,Vivaan Sharma,10-A,Female,Computer Science,67,Pass
+R033,Isha Desai,10-A,Female,Mathematics,55,Pass
+R033,Isha Desai,10-A,Female,Science,82,Pass
+R033,Isha Desai,10-A,Female,English,55,Pass
+R033,Isha Desai,10-A,Female,History,64,Pass
+R033,Isha Desai,10-A,Female,Computer Science,77,Pass
+R034,Isha Rao,10-A,Male,Mathematics,59,Pass
+R034,Isha Rao,10-A,Male,Science,81,Pass
+R034,Isha Rao,10-A,Male,English,79,Pass
+R034,Isha Rao,10-A,Male,History,71,Pass
+R034,Isha Rao,10-A,Male,Computer Science,57,Pass
+R035,Rohan Patil,10-B,Female,Mathematics,61,Pass
+R035,Rohan Patil,10-B,Female,Science,88,Pass
+R035,Rohan Patil,10-B,Female,English,66,Pass
+R035,Rohan Patil,10-B,Female,History,59,Pass
+R035,Rohan Patil,10-B,Female,Computer Science,59,Pass
+R036,Dev Joshi,10-A,Male,Mathematics,52,Pass
+R036,Dev Joshi,10-A,Male,Science,58,Pass
+R036,Dev Joshi,10-A,Male,English,69,Pass
+R036,Dev Joshi,10-A,Male,History,74,Pass
+R036,Dev Joshi,10-A,Male,Computer Science,68,Pass
+R037,Rohan Mehta,10-A,Male,Mathematics,77,Pass
+R037,Rohan Mehta,10-A,Male,Science,85,Pass
+R037,Rohan Mehta,10-A,Male,English,64,Pass
+R037,Rohan Mehta,10-A,Male,History,54,Pass
+R037,Rohan Mehta,10-A,Male,Computer Science,57,Pass
+R038,Myra Mehta,10-B,Female,Mathematics,42,Pass
+R038,Myra Mehta,10-B,Female,Science,70,Pass
+R038,Myra Mehta,10-B,Female,English,76,Pass
+R038,Myra Mehta,10-B,Female,History,57,Pass
+R038,Myra Mehta,10-B,Female,Computer Science,39,Pass
+R039,Saanvi Kulkarni,10-C,Female,Mathematics,57,Pass
+R039,Saanvi Kulkarni,10-C,Female,Science,54,Pass
+R039,Saanvi Kulkarni,10-C,Female,English,55,Pass
+R039,Saanvi Kulkarni,10-C,Female,History,54,Pass
+R039,Saanvi Kulkarni,10-C,Female,Computer Science,70,Pass
+R040,Dev Joshi,10-C,Female,Mathematics,53,Pass
+R040,Dev Joshi,10-C,Female,Science,62,Pass
+R040,Dev Joshi,10-C,Female,English,78,Pass
+R040,Dev Joshi,10-C,Female,History,87,Pass
+R040,Dev Joshi,10-C,Female,Computer Science,73,Pass
+R041,Aarav Patil,10-B,Male,Mathematics,86,Pass
+R041,Aarav Patil,10-B,Male,Science,87,Pass
+R041,Aarav Patil,10-B,Male,English,100,Pass
+R041,Aarav Patil,10-B,Male,History,65,Pass
+R041,Aarav Patil,10-B,Male,Computer Science,72,Pass
+R042,Diya Mehta,10-C,Male,Mathematics,54,Pass
+R042,Diya Mehta,10-C,Male,Science,65,Pass
+R042,Diya Mehta,10-C,Male,English,73,Pass
+R042,Diya Mehta,10-C,Male,History,69,Pass
+R042,Diya Mehta,10-C,Male,Computer Science,67,Pass
+R043,Zoya Kulkarni,10-A,Male,Mathematics,71,Pass
+R043,Zoya Kulkarni,10-A,Male,Science,60,Pass
+R043,Zoya Kulkarni,10-A,Male,English,45,Pass
+R043,Zoya Kulkarni,10-A,Male,History,63,Pass
+R043,Zoya Kulkarni,10-A,Male,Computer Science,75,Pass
+R044,Aditya Nair,10-B,Female,Mathematics,42,Pass
+R044,Aditya Nair,10-B,Female,Science,49,Pass
+R044,Aditya Nair,10-B,Female,English,39,Pass
+R044,Aditya Nair,10-B,Female,History,61,Pass
+R044,Aditya Nair,10-B,Female,Computer Science,51,Pass
+R045,Saanvi Gupta,10-C,Female,Mathematics,42,Pass
+R045,Saanvi Gupta,10-C,Female,Science,45,Pass
+R045,Saanvi Gupta,10-C,Female,English,68,Pass
+R045,Saanvi Gupta,10-C,Female,History,65,Pass
+R045,Saanvi Gupta,10-C,Female,Computer Science,50,Pass
+R046,Dev Iyer,10-B,Female,Mathematics,79,Pass
+R046,Dev Iyer,10-B,Female,Science,59,Pass
+R046,Dev Iyer,10-B,Female,English,71,Pass
+R046,Dev Iyer,10-B,Female,History,73,Pass
+R046,Dev Iyer,10-B,Female,Computer Science,66,Pass
+R047,Arjun Gupta,10-C,Female,Mathematics,63,Pass
+R047,Arjun Gupta,10-C,Female,Science,94,Pass
+R047,Arjun Gupta,10-C,Female,English,95,Pass
+R047,Arjun Gupta,10-C,Female,History,64,Pass
+R047,Arjun Gupta,10-C,Female,Computer Science,65,Pass
+R048,Rohan Gupta,10-C,Female,Mathematics,63,Pass
+R048,Rohan Gupta,10-C,Female,Science,58,Pass
+R048,Rohan Gupta,10-C,Female,English,48,Pass
+R048,Rohan Gupta,10-C,Female,History,60,Pass
+R048,Rohan Gupta,10-C,Female,Computer Science,53,Pass
+R049,Meera Desai,10-C,Female,Mathematics,74,Pass
+R049,Meera Desai,10-C,Female,Science,45,Pass
+R049,Meera Desai,10-C,Female,English,45,Pass
+R049,Meera Desai,10-C,Female,History,57,Pass
+R049,Meera Desai,10-C,Female,Computer Science,71,Pass
+R050,Neel Iyer,10-C,Female,Mathematics,74,Pass
+R050,Neel Iyer,10-C,Female,Science,59,Pass
+R050,Neel Iyer,10-C,Female,English,52,Pass
+R050,Neel Iyer,10-C,Female,History,60,Pass
+R050,Neel Iyer,10-C,Female,Computer Science,49,Pass
+R051,Diya Patil,10-B,Female,Mathematics,94,Pass
+R051,Diya Patil,10-B,Female,Science,84,Pass
+R051,Diya Patil,10-B,Female,English,72,Pass
+R051,Diya Patil,10-B,Female,History,69,Pass
+R051,Diya Patil,10-B,Female,Computer Science,84,Pass
+R052,Arjun Joshi,10-B,Male,Mathematics,98,Pass
+R052,Arjun Joshi,10-B,Male,Science,60,Pass
+R052,Arjun Joshi,10-B,Male,English,66,Pass
+R052,Arjun Joshi,10-B,Male,History,67,Pass
+R052,Arjun Joshi,10-B,Male,Computer Science,66,Pass
+R053,Tara Nair,10-A,Male,Mathematics,41,Pass
+R053,Tara Nair,10-A,Male,Science,80,Pass
+R053,Tara Nair,10-A,Male,English,43,Pass
+R053,Tara Nair,10-A,Male,History,67,Pass
+R053,Tara Nair,10-A,Male,Computer Science,57,Pass
+R054,Isha Gupta,10-A,Female,Mathematics,74,Pass
+R054,Isha Gupta,10-A,Female,Science,80,Pass
+R054,Isha Gupta,10-A,Female,English,98,Pass
+R054,Isha Gupta,10-A,Female,History,77,Pass
+R054,Isha Gupta,10-A,Female,Computer Science,75,Pass
+R055,Dev Joshi,10-A,Female,Mathematics,68,Pass
+R055,Dev Joshi,10-A,Female,Science,77,Pass
+R055,Dev Joshi,10-A,Female,English,60,Pass
+R055,Dev Joshi,10-A,Female,History,78,Pass
+R055,Dev Joshi,10-A,Female,Computer Science,56,Pass
+R056,Riya Pillai,10-A,Male,Mathematics,55,Pass
+R056,Riya Pillai,10-A,Male,Science,48,Pass
+R056,Riya Pillai,10-A,Male,English,47,Pass
+R056,Riya Pillai,10-A,Male,History,48,Pass
+R056,Riya Pillai,10-A,Male,Computer Science,74,Pass
+R057,Aditya Sharma,10-B,Female,Mathematics,67,Pass
+R057,Aditya Sharma,10-B,Female,Science,64,Pass
+R057,Aditya Sharma,10-B,Female,English,64,Pass
+R057,Aditya Sharma,10-B,Female,History,78,Pass
+R057,Aditya Sharma,10-B,Female,Computer Science,68,Pass
+R058,Dev Patil,10-B,Male,Mathematics,64,Pass
+R058,Dev Patil,10-B,Male,Science,54,Pass
+R058,Dev Patil,10-B,Male,English,61,Pass
+R058,Dev Patil,10-B,Male,History,49,Pass
+R058,Dev Patil,10-B,Male,Computer Science,55,Pass
+R059,Vivaan Patil,10-B,Female,Mathematics,58,Pass
+R059,Vivaan Patil,10-B,Female,Science,58,Pass
+R059,Vivaan Patil,10-B,Female,English,50,Pass
+R059,Vivaan Patil,10-B,Female,History,39,Pass
+R059,Vivaan Patil,10-B,Female,Computer Science,44,Pass
+R060,Neel Pillai,10-A,Male,Mathematics,91,Pass
+R060,Neel Pillai,10-A,Male,Science,95,Pass
+R060,Neel Pillai,10-A,Male,English,69,Pass
+R060,Neel Pillai,10-A,Male,History,82,Pass
+R060,Neel Pillai,10-A,Male,Computer Science,96,Pass

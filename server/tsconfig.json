@@ -13,6 +13,5 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["node"]
   },
-  "include": ["src", "test", "prisma.config.ts", "vitest.config.mts"],
-  "exclude": ["test/setup.ts"]
+  "include": ["src", "test", "vitest.config.mts"]
 }
