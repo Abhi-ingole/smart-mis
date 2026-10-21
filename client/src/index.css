@@ -1,0 +1,95 @@
+@import "@fontsource/ibm-plex-sans/400.css";
+@import "@fontsource/ibm-plex-sans/500.css";
+@import "@fontsource/ibm-plex-sans/600.css";
+@import "@fontsource/ibm-plex-sans/700.css";
+@import "tailwindcss";
+
+/*
+  Smart MIS design tokens.
+  Two channels, two colours, used consistently everywhere:
+  WhatsApp = leaf green, Email = indigo. Everything else stays neutral ink.
+*/
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #17202e;
+  --color-ink-soft: #4a5568;
+  --color-ink-faint: #8792a2;
+  --color-line: #dfe4ea;
+  --color-canvas: #f3f5f8;
+  --color-panel: #ffffff;
+  --color-rail: #1b2536;
+
+  --color-wa: #1f8a5b;
+  --color-wa-soft: #e5f4ec;
+  --color-mail: #4b57d1;
+  --color-mail-soft: #ebedfb;
+
+  --color-up: #1f7a4d;
+  --color-down: #c0392b;
+  --color-warn: #a86414;
+  --color-warn-soft: #fdf3e3;
+  --color-bad-soft: #fcecea;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "tnum" 1;
+    line-height: 1.5;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-mail);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-md px-3.5 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-md border border-line bg-white px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-mail focus:outline-none focus:ring-2 focus:ring-mail/20 disabled:bg-canvas disabled:text-ink-faint;
+  }
+  .label {
+    @apply mb-1 block text-sm font-medium text-ink-soft;
+  }
+  .panel {
+    @apply rounded-lg border border-line bg-panel;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-white hover:bg-ink/85;
+  }
+  .btn-secondary {
+    @apply btn border border-line bg-white text-ink hover:bg-canvas;
+  }
+  .btn-ghost {
+    @apply btn text-ink-soft hover:bg-canvas hover:text-ink;
+  }
+  .btn-danger {
+    @apply btn border border-down/30 bg-white text-down hover:bg-bad-soft;
+  }
+  .table {
+    @apply w-full text-left text-sm;
+  }
+  .table th {
+    @apply border-b border-line px-3 py-2 font-medium text-ink-soft;
+  }
+  .table td {
+    @apply border-b border-line px-3 py-2;
+  }
+}
