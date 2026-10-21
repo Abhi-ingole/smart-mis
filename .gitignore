@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+
+# secrets
+.env
+.env.*
+!.env.example
+
+# data — never commit
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+uploads/
+backups/
+
+# build output
+dist/
+server/src/generated/
+
+# misc
+*.log
+.DS_Store
+coverage/
+.vscode/
+.idea/
