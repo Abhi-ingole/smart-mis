@@ -12,7 +12,9 @@
     "migrate": "tsx src/scripts/migrate.ts",
     "seed": "tsx src/scripts/migrate.ts && tsx src/scripts/seed.ts",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "create-admin": "tsx src/scripts/create-admin.ts",
+    "backup": "tsx src/jobs/backup.ts"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "7.10.1",

@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+.env
+.env.*
+**/*.db
+**/*.db-*
+**/uploads
+**/backups
+**/dist
+server/src/generated
+.git
+docs
+coverage
