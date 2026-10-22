@@ -16,7 +16,7 @@ export interface RawSheet {
 
 export interface ParsedFile {
   fileName: string;
-  kind: "csv" | "xlsx" | "xls";
+  kind: "csv" | "xlsx" | "xls" | "json" | "pdf";
   sizeBytes: number;
   sheets: RawSheet[];
 }

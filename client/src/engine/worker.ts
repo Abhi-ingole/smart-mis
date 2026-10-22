@@ -5,7 +5,7 @@
  */
 import { parseFile, ParseError } from "./parse";
 import { analyzeSheet, STAGES } from "./pipeline";
-import type { AnalysisProgress, DatasetRecord, RawSheet } from "./types";
+import type { AnalysisProgress, DatasetRecord, ParsedFile, RawSheet } from "./types";
 
 export type WorkerRequest =
   | { type: "inspect"; file: File }
@@ -20,7 +20,7 @@ export type WorkerResponse =
 const post = (m: WorkerResponse) => (self as unknown as Worker).postMessage(m);
 
 // Cache the last parsed file so "inspect" then "analyze" doesn't parse twice.
-let cache: { key: string; sheets: RawSheet[]; kind: "csv" | "xlsx" | "xls" } | null = null;
+let cache: { key: string; sheets: RawSheet[]; kind: ParsedFile["kind"] } | null = null;
 const keyOf = (f: File) => `${f.name}:${f.size}:${f.lastModified}`;
 
 self.onmessage = async (e: MessageEvent<WorkerRequest>) => {

@@ -1,5 +1,5 @@
 /**
- * Spreadsheet parser: CSV (Papa Parse) and Excel .xlsx/.xls (SheetJS).
+ * File parser: CSV (Papa Parse), Excel .xlsx/.xls (SheetJS), JSON, and PDF tables (pdf.js, loaded on demand).
  * Runs in the browser (inside a Web Worker) — the file never leaves the device.
  */
 import Papa from "papaparse";
@@ -15,13 +15,16 @@ export const LIMITS = {
 
 export class ParseError extends Error {}
 
-const EXT_KIND: Record<string, ParsedFile["kind"]> = { csv: "csv", tsv: "csv", txt: "csv", xlsx: "xlsx", xlsm: "xlsx", xls: "xls" };
+const EXT_KIND: Record<string, ParsedFile["kind"]> = { csv: "csv", tsv: "csv", txt: "csv", xlsx: "xlsx", xlsm: "xlsx", xls: "xls", json: "json", pdf: "pdf" };
+
+/** Extensions the upload engine can read directly (ZIP archives and folders are unpacked into these). */
+export const SUPPORTED_EXTS = Object.keys(EXT_KIND);
 
 /** Validates name, size and file signature before any parsing. */
 export function detectKind(fileName: string, size: number, head: Uint8Array): ParsedFile["kind"] {
   const ext = (fileName.split(".").pop() ?? "").toLowerCase();
   const kind = EXT_KIND[ext];
-  if (!kind) throw new ParseError(`"${fileName}" isn't a supported file. Upload Excel (.xlsx, .xls) or CSV files.`);
+  if (!kind) throw new ParseError(`"${fileName}" isn't a supported file. Upload Excel (.xlsx, .xls), CSV, JSON, PDF or a ZIP of them.`);
   if (size === 0) throw new ParseError(`"${fileName}" is empty.`);
   if (size > LIMITS.maxFileBytes) throw new ParseError(`"${fileName}" is ${(size / 1048576).toFixed(1)} MB. The limit for in-browser analysis is ${LIMITS.maxFileBytes / 1048576} MB — split the file or remove unused columns.`);
   const is = (...b: number[]) => b.every((v, i) => head[i] === v);
@@ -32,6 +35,11 @@ export function detectKind(fileName: string, size: number, head: Uint8Array): Pa
     // Some systems export HTML or CSV with an .xls name; SheetJS can still read those, so allow text.
     if (head.includes(0)) throw new ParseError(`"${fileName}" doesn't look like a real Excel file.`);
   }
+  if (kind === "pdf" && !(head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46)) {
+    // "%PDF" can follow a few junk bytes in some exports; accept it anywhere in the first 1 KB.
+    if (!new TextDecoder("latin1").decode(head.subarray(0, 1024)).includes("%PDF")) throw new ParseError(`"${fileName}" doesn't look like a real PDF.`);
+  }
+  if (kind === "json" && (zip || ole || head.subarray(0, 4096).includes(0))) throw new ParseError(`"${fileName}" is a binary file, not JSON.`);
   if (kind === "csv") {
     if (zip || ole) throw new ParseError(`"${fileName}" is a binary file, not CSV. If it's an Excel file, rename it to .xlsx/.xls.`);
     if (head.subarray(0, 4096).includes(0)) throw new ParseError(`"${fileName}" contains binary data and can't be read as CSV.`);
@@ -158,14 +166,55 @@ export function parseWorkbook(data: ArrayBuffer | Uint8Array): RawSheet[] {
   });
 }
 
+/** JSON: an array of records, or an object holding one (e.g. {"data": [...]}). Nested objects become "parent.child" columns. */
+export function parseJsonText(text: string, name = "Data"): RawSheet {
+  let data: unknown;
+  try {
+    data = JSON.parse(text.replace(/^\uFEFF/, ""));
+  } catch (e) {
+    throw new ParseError(`This JSON can't be read: ${(e as Error).message}`);
+  }
+  const findArray = (v: unknown, depth = 0): unknown[] | null => {
+    if (Array.isArray(v)) return v;
+    if (v && typeof v === "object" && depth < 3) {
+      const arrays = Object.values(v).map((x) => findArray(x, depth + 1)).filter((x): x is unknown[] => !!x);
+      return arrays.sort((a, b) => b.length - a.length)[0] ?? null;
+    }
+    return null;
+  };
+  const arr = findArray(data);
+  if (!arr || !arr.length) throw new ParseError("This JSON has no list of records to analyse.");
+  if (arr.every((r) => Array.isArray(r))) return buildSheet(name, (arr as unknown[][]).map((r) => r.map(cellToValue)));
+  const flat = (o: unknown, prefix = "", out: Record<string, unknown> = {}) => {
+    if (o && typeof o === "object" && !Array.isArray(o) && !(o instanceof Date)) {
+      for (const [k, v] of Object.entries(o)) {
+        if (v && typeof v === "object" && !Array.isArray(v) && prefix.split(".").length < 3) flat(v, `${prefix}${k}.`, out);
+        else out[`${prefix}${k}`] = Array.isArray(v) ? v.map((x) => (typeof x === "object" ? JSON.stringify(x) : String(x))).join(", ") : v;
+      }
+    } else out[prefix ? prefix.slice(0, -1) : "value"] = o;
+    return out;
+  };
+  const records = arr.map((r) => flat(r));
+  const headers: string[] = [];
+  const seen = new Set<string>();
+  for (const r of records) for (const k of Object.keys(r)) if (!seen.has(k)) (seen.add(k), headers.push(k));
+  return buildSheet(name, [headers, ...records.map((r) => headers.map((h) => cellToValue(r[h])))]);
+}
+
 export async function parseFile(file: { name: string; size: number; arrayBuffer: () => Promise<ArrayBuffer> }): Promise<ParsedFile> {
   const buf = await file.arrayBuffer();
   const head = new Uint8Array(buf.slice(0, 8192));
   const kind = detectKind(file.name, file.size, head);
   let sheets: RawSheet[];
+  const base = (file.name.split(/[\\/›]/).pop() ?? file.name).trim().replace(/\.[^.]+$/, "");
   if (kind === "csv") {
     const text = new TextDecoder("utf-8").decode(buf);
-    sheets = [parseCsvText(text, file.name.replace(/\.[^.]+$/, ""))];
+    sheets = [parseCsvText(text, base)];
+  } else if (kind === "json") {
+    sheets = [parseJsonText(new TextDecoder("utf-8").decode(buf), base)];
+  } else if (kind === "pdf") {
+    const { parsePdf } = await import("./pdf");
+    sheets = await parsePdf(buf, file.name);
   } else {
     sheets = parseWorkbook(buf);
   }

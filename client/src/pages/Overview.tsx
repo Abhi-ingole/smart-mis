@@ -47,7 +47,7 @@ export default function OverviewPage() {
         <div className="relative max-w-2xl">
           <h1 className={`${has ? "text-2xl sm:text-3xl" : "text-3xl sm:text-5xl"} font-semibold leading-tight tracking-tight`}>Turn any spreadsheet into intelligent insights</h1>
           <p className="mt-4 max-w-xl text-base text-ink-soft sm:text-lg">
-            Upload your Excel or CSV file and automatically generate interactive dashboards, meaningful KPIs, and professional MIS reports.
+            Upload Excel, CSV, JSON or PDF files — or a whole folder or ZIP — and automatically generate interactive dashboards, meaningful KPIs, and professional MIS reports.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link to="/upload" className="btn-primary px-5 py-2.5 text-base">
@@ -59,7 +59,7 @@ export default function OverviewPage() {
           </div>
           <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-soft">
             <span className="flex items-center gap-1.5">
-              <FileSpreadsheet className="h-4 w-4" /> .xlsx, .xls and .csv, multiple sheets
+              <FileSpreadsheet className="h-4 w-4" /> Excel, CSV, JSON, PDF tables, ZIPs and folders
             </span>
             <span className="flex items-center gap-1.5">
               <Lock className="h-4 w-4" /> Processed in your browser — files are not uploaded
