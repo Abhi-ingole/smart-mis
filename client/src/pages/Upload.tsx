@@ -1,7 +1,8 @@
 import { useRef, useState, type DragEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { CheckCircle2, FileSpreadsheet, Lock, Trash2, UploadCloud } from "lucide-react";
-import { LIMITS } from "../engine/parse";
+import { CheckCircle2, FileSpreadsheet, FolderOpen, Lock, Trash2, UploadCloud } from "lucide-react";
+import { LIMITS, SUPPORTED_EXTS } from "../engine/parse";
+import { collect, itemsFromDrop, itemsFromInput, type Collected } from "../state/collect";
 import { inspectFile, type SheetInfo } from "../state/upload";
 import { useAnalyzer, type AnalyzerResult } from "../state/useAnalyzer";
 import { AnalysisProgress } from "../components/AnalysisProgress";
@@ -15,14 +16,19 @@ interface Pending {
   selected: string[];
 }
 
-const ACCEPT = ".xlsx,.xls,.xlsm,.csv,.tsv,.txt";
+const ACCEPT = ".xlsx,.xls,.xlsm,.csv,.tsv,.txt,.json,.pdf,.zip";
+// Non-standard attributes that make a file input pick a whole folder.
+const FOLDER_ATTRS = { webkitdirectory: "", directory: "" } as Record<string, string>;
 const fmtSize = (b: number) => (b > 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`);
 
 export default function UploadPage() {
   const [pending, setPending] = useState<Pending[]>([]);
   const [drag, setDrag] = useState(false);
   const [result, setResult] = useState<AnalyzerResult | null>(null);
+  const [skipped, setSkipped] = useState<Collected["skipped"]>([]);
+  const [collecting, setCollecting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const folderRef = useRef<HTMLInputElement>(null);
   const { run, busy, progress, label } = useAnalyzer();
   const navigate = useNavigate();
 
@@ -31,7 +37,7 @@ export default function UploadPage() {
     const files = [...list];
     const fresh: Pending[] = files.map((file) => {
       const ext = (file.name.split(".").pop() ?? "").toLowerCase();
-      if (!["xlsx", "xls", "xlsm", "csv", "tsv", "txt"].includes(ext)) return { file, status: "error", error: "Not a supported file type. Use .xlsx, .xls or .csv.", sheets: [], selected: [] };
+      if (!SUPPORTED_EXTS.includes(ext)) return { file, status: "error", error: "Not a supported file type. Use Excel, CSV, JSON, PDF, or a ZIP/folder of them.", sheets: [], selected: [] };
       if (file.size > LIMITS.maxFileBytes) return { file, status: "error", error: `Too large (${fmtSize(file.size)}). The in-browser limit is ${LIMITS.maxFileBytes / 1048576} MB.`, sheets: [], selected: [] };
       if (file.size === 0) return { file, status: "error", error: "The file is empty.", sheets: [], selected: [] };
       return { file, status: "inspecting", sheets: [], selected: [] };
@@ -48,18 +54,33 @@ export default function UploadPage() {
     }
   };
 
+  /** Unpacks folders and ZIPs, then inspects every readable file. */
+  const addItems = async (items: Promise<Parameters<typeof collect>[0]> | Parameters<typeof collect>[0]) => {
+    setCollecting(true);
+    try {
+      const c = await collect(await items);
+      setSkipped(c.skipped);
+      if (c.files.length) await addFiles(c.files);
+      else if (!c.skipped.length) setSkipped([{ reason: "Nothing readable was found", names: [] }]);
+    } finally {
+      setCollecting(false);
+    }
+  };
+
   const onDrop = (e: DragEvent) => {
     e.preventDefault();
     setDrag(false);
-    if (e.dataTransfer.files.length) void addFiles(e.dataTransfer.files);
+    // Read the dropped entries now — the browser clears them once this handler returns.
+    if (e.dataTransfer.items.length || e.dataTransfer.files.length) void addItems(itemsFromDrop(e.dataTransfer));
   };
 
   const ready = pending.filter((p) => p.status === "ready" && p.selected.length);
-  const inspecting = pending.some((p) => p.status === "inspecting");
+  const inspecting = collecting || pending.some((p) => p.status === "inspecting");
 
   const start = async () => {
     const r = await run(ready.map((p) => ({ file: p.file, sheets: p.selected })));
     setPending([]);
+    setSkipped([]);
     setResult(r);
     if (r.datasets.length === 1 && !r.problems.length) navigate(`/dashboard/${r.datasets[0].id}`);
   };
@@ -68,7 +89,7 @@ export default function UploadPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Upload data" description="Excel (.xlsx, .xls) or CSV. Add several files at once; for workbooks with more than one sheet, choose the sheets to analyse." />
+      <PageHeader title="Upload data" description="Excel, CSV, JSON or PDF tables — or drop a whole folder or ZIP and every readable file inside is scanned. For workbooks with more than one sheet, choose the sheets to analyse." />
 
       {result && (
         <div className="space-y-3">
@@ -126,30 +147,60 @@ export default function UploadPage() {
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-soft text-accent">
           <UploadCloud className="h-7 w-7" />
         </div>
-        <p className="mt-4 text-lg font-semibold">Drag and drop spreadsheets here</p>
+        <p className="mt-4 text-lg font-semibold">Drag and drop files, folders or ZIPs here</p>
         <p className="mt-1 text-sm text-ink-soft">or</p>
-        <button className="btn-primary mt-3" onClick={() => inputRef.current?.click()}>
-          Choose files from your computer
-        </button>
+        <div className="mt-3 flex flex-wrap justify-center gap-2">
+          <button className="btn-primary" onClick={() => inputRef.current?.click()}>
+            Choose files
+          </button>
+          <button className="btn-secondary" onClick={() => folderRef.current?.click()}>
+            <FolderOpen className="h-4 w-4" /> Choose a folder
+          </button>
+        </div>
         <input
           ref={inputRef}
           type="file"
           multiple
           accept={ACCEPT}
           className="sr-only"
-          aria-label="Choose spreadsheet files"
+          aria-label="Choose files"
           onChange={(e) => {
-            if (e.target.files?.length) void addFiles(e.target.files);
+            if (e.target.files?.length) void addItems(itemsFromInput(e.target.files));
             e.target.value = "";
           }}
         />
+        <input
+          ref={folderRef}
+          type="file"
+          multiple
+          {...FOLDER_ATTRS}
+          className="sr-only"
+          aria-label="Choose a folder"
+          onChange={(e) => {
+            if (e.target.files?.length) void addItems(itemsFromInput(e.target.files));
+            e.target.value = "";
+          }}
+        />
+        {collecting && <p className="mt-4 text-sm text-accent">Scanning folders and ZIP files…</p>}
         <p className="mt-5 text-xs text-ink-faint">
-          .xlsx · .xls · .csv — up to {LIMITS.maxFileBytes / 1048576} MB and {LIMITS.maxRows.toLocaleString("en-IN")} rows per sheet
+          .xlsx · .xls · .csv · .json · .pdf · .zip · folders — up to {LIMITS.maxFileBytes / 1048576} MB and {LIMITS.maxRows.toLocaleString("en-IN")} rows per sheet
         </p>
         <p className="mt-2 flex items-center gap-1.5 text-xs text-ink-faint">
           <Lock className="h-3.5 w-3.5" /> Files are read in your browser and never uploaded to a server.
         </p>
       </div>
+
+      {skipped.length > 0 && (
+        <Alert kind="info">
+          <span className="block font-medium">Some files were left out:</span>
+          {skipped.map((s) => (
+            <span key={s.reason} className="mt-1 block text-sm">
+              {s.reason}
+              {s.names.length > 0 && ` (${s.names.length}): ${s.names.slice(0, 4).join(", ")}${s.names.length > 4 ? ` and ${s.names.length - 4} more` : ""}`}
+            </span>
+          ))}
+        </Alert>
+      )}
 
       {pending.length > 0 && (
         <div className="card divide-y divide-line">

@@ -35,7 +35,7 @@ export function DatasetGate({ base, title, children }: { base: string; title: st
             </>
           }
         >
-          {title} appears here once you upload an Excel or CSV file. Nothing is shown until there is real data.
+          {title} appears here once you upload a file (Excel, CSV, JSON, PDF or a ZIP/folder). Nothing is shown until there is real data.
         </EmptyState>
       );
     if (activeId) return <Navigate to={`${base}/${activeId}`} replace />;

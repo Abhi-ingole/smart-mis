@@ -1,6 +1,6 @@
 # Smart MIS — universal spreadsheet intelligence
 
-Upload **any** Excel or CSV file and get, automatically:
+Upload **any** Excel, CSV, JSON or PDF-table file — or drop a whole **folder** or **ZIP** (nested ZIPs too) and every readable file inside is scanned — and get, automatically:
 
 - column type detection (numbers, money, percentages, dates, categories, IDs…)
 - a data-quality score with clear warnings (missing values, duplicates, invalid values, outliers)
@@ -45,7 +45,7 @@ On Windows use the same commands in Command Prompt or PowerShell. To create `.en
 | Page | Purpose |
 |---|---|
 | **Overview** | Hero with *Upload your data* / *Explore demo*; recent datasets with quality score and a colour "type fingerprint" |
-| **Upload Data** | Drag-and-drop or choose several files; pick worksheets; real progress through each analysis stage (runs in a Web Worker) |
+| **Upload Data** | Drag-and-drop or choose several files, a whole folder, or ZIP archives (unpacked in the browser, zip-bomb limits applied); text PDFs are turned back into tables (scanned PDFs are reported, not guessed); pick worksheets; real progress through each analysis stage (runs in a Web Worker) |
 | **My Datasets** | Search, rename, preview original rows, delete, and **combine two datasets** with a guided join (key selection, match rate, warnings, preview) |
 | **Auto Dashboards** | KPI cards with formula, comparison with the previous period and a mini trend line; recommended charts; filters; add/remove/rename KPIs; add charts; one-click **PDF** of the whole dashboard |
 | **Report Builder** | 11-section MIS report preview; choose sections; export PDF / Excel / CSV; print-friendly layout |
