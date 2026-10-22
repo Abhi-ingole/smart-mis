@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { BarChart3, Database, FileText, Gauge, Home, Lightbulb, Lock, Menu, Settings, ShieldCheck, Upload, X } from "lucide-react";
+import { BarChart3, Database, FileText, Home, Lightbulb, Lock, Menu, Settings, ShieldCheck, Upload, X } from "lucide-react";
 import { useDatasets } from "../state/datasets";
+import logoUrl from "../assets/ingoviq-logo.png";
 
 export function Layout({ children }: { children: ReactNode }) {
   const { activeId, datasets } = useDatasets();
@@ -43,13 +44,11 @@ export function Layout({ children }: { children: ReactNode }) {
   );
 
   const brand = (
-    <NavLink to="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-white">
-        <Gauge className="h-4.5 w-4.5" aria-hidden />
-      </span>
-      <span className="leading-tight">
-        <span className="block text-sm font-semibold text-ink">Smart MIS</span>
-        <span className="block text-xs text-ink-faint">Spreadsheet intelligence</span>
+    <NavLink to="/" className="block" onClick={() => setOpen(false)} aria-label="INGOVIQ AI Smart MIS — home">
+      <img src={logoUrl} alt="INGOVIQ AI" width={900} height={279} className="h-9 w-auto lg:h-auto lg:w-44" />
+      <span className="mt-2 hidden items-center gap-1.5 text-xs font-medium text-ink-soft lg:flex">
+        <span className="rounded bg-accent-soft px-1.5 py-0.5 font-semibold text-accent">Smart MIS</span>
+        <span>Spreadsheet intelligence</span>
       </span>
     </NavLink>
   );
@@ -71,6 +70,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
         Local-only: your files are processed and stored in this browser.
       </p>
+      <p className="text-[11px] text-ink-faint">© {new Date().getFullYear()} INGOVIQ AI</p>
     </div>
   );
 
@@ -91,7 +91,7 @@ export function Layout({ children }: { children: ReactNode }) {
         </button>
       </header>
       {open && (
-        <div className="no-print fixed inset-x-0 top-[57px] z-20 space-y-5 border-b border-line bg-surface p-4 shadow-lg lg:hidden">
+        <div className="no-print fixed inset-x-0 top-[61px] z-20 space-y-5 border-b border-line bg-surface p-4 shadow-lg lg:hidden">
           {nav}
           {footer}
         </div>

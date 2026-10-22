@@ -5,7 +5,7 @@
 @import "tailwindcss";
 
 /*
-  Smart MIS design tokens — light, calm surfaces with one confident indigo accent.
+  Smart MIS by INGOVIQ AI — light, calm surfaces with the INGOVIQ brand blue as the one accent.
   Column types have their own colours (the "type fingerprint"), used consistently
   in dataset cards, the column list and the mapping table.
 */
@@ -21,9 +21,11 @@
   --color-line: #e3e7ef;
   --color-line-strong: #cfd5e1;
 
-  --color-accent: #3b4fd8;
-  --color-accent-strong: #2f3fb8;
-  --color-accent-soft: #eef0fd;
+  --color-accent: #0f55e0;
+  --color-accent-strong: #0a3fb0;
+  --color-accent-soft: #e8f0ff;
+  --color-brand-navy: #04183d;
+  --color-brand-cyan: #05c0fc;
 
   --color-good: #15865a;
   --color-good-soft: #e7f5ee;
@@ -33,7 +35,7 @@
   --color-bad-soft: #fcecea;
 
   /* column type colours */
-  --color-t-number: #3b4fd8;
+  --color-t-number: #0f55e0;
   --color-t-currency: #15865a;
   --color-t-percentage: #0e8fa0;
   --color-t-date: #b0610f;

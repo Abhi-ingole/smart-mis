@@ -1,4 +1,6 @@
-# Smart MIS — universal spreadsheet intelligence
+<p align="center"><img src="docs/brand/ingoviq-logo.png" alt="INGOVIQ AI" width="420" /></p>
+
+# Smart MIS by INGOVIQ AI — universal spreadsheet intelligence
 
 Upload **any** Excel, CSV, JSON or PDF-table file — or drop a whole **folder** or **ZIP** (nested ZIPs too) and every readable file inside is scanned — and get, automatically:
 

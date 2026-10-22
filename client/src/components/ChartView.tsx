@@ -4,7 +4,7 @@ import type { ChartSpec, ColumnSchema, Table } from "../engine/types";
 import { buildChartData, chartDataTable, type ChartData } from "../engine/charts";
 import { fmtCompact, fmtNumber, fmtValue } from "../engine/format";
 
-export const PALETTE = ["#3b4fd8", "#0e9f8e", "#e0802a", "#a23bc7", "#2f8fd8", "#c94a6b", "#6b8f1d", "#7a5af0"];
+export const PALETTE = ["#0f55e0", "#0e9f8e", "#e0802a", "#a23bc7", "#05a3d6", "#c94a6b", "#6b8f1d", "#7a5af0"];
 const AXIS = { fontSize: 11, fill: "var(--color-ink-faint)" };
 const TOOLTIP = { contentStyle: { borderRadius: 8, border: "1px solid var(--color-line)", fontSize: 12, boxShadow: "var(--shadow-card)" } };
 const short = (v: string, n = 12) => (v.length > n ? v.slice(0, n - 1) + "…" : v);

@@ -10,6 +10,7 @@ import { buildReport, REPORT_SECTIONS, type SectionId } from "../engine/report";
 import { download, reportPdf, reportWorkbook, tableCsv } from "../export/exporters";
 import { fmtDate } from "../engine/format";
 import type { Filters } from "../engine/types";
+import logoUrl from "../assets/ingoviq-logo.png";
 
 export default function ReportBuilderPage() {
   return (
@@ -143,9 +144,13 @@ function Builder({ record, analysis }: Loaded) {
 
         <article ref={previewRef} className="print-page card mx-auto w-full min-w-0 max-w-4xl space-y-8 overflow-hidden bg-white p-6 sm:p-10">
           <header className="border-b-2 border-accent pb-5">
+            <div className="mb-5 flex items-center justify-between gap-4">
+              <img src={logoUrl} alt="INGOVIQ AI" className="h-8 w-auto sm:h-10" />
+              <span className="text-[11px] font-semibold tracking-wider text-accent">SMART MIS REPORT</span>
+            </div>
             <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{model.title}</h1>
             <p className="mt-2 text-sm text-ink-soft">Reporting period: {model.periodNote}</p>
-            <p className="text-xs text-ink-faint">Generated {fmtDate(model.generatedAt.slice(0, 10))} · Smart MIS</p>
+            <p className="text-xs text-ink-faint">Generated {fmtDate(model.generatedAt.slice(0, 10))} · Smart MIS by INGOVIQ AI</p>
             {model.filtersNote && <p className="mt-1 text-xs text-warn">Filters applied: {model.filtersNote}</p>}
           </header>
 

@@ -6,6 +6,7 @@ import * as XLSX from "@e965/xlsx";
 import type { Table } from "../engine/types";
 import type { ReportModel } from "../engine/report";
 import { fmtDate } from "../engine/format";
+import logoUrl from "../assets/ingoviq-logo.png";
 
 /** Cells starting with = + - @ (or tab/CR) are prefixed with ' so spreadsheet apps don't run them as formulas. */
 export function safeCell(v: string | number | boolean | null | undefined): string {
@@ -122,6 +123,25 @@ export function pdfText(s: string): string {
     .replace(/[^\x00-\xff]/g, (ch) => (WINANSI_EXTRA.has(ch) ? ch : "?"));
 }
 
+/** The INGOVIQ AI logo as a PNG data URL for PDFs (null outside a browser, e.g. in tests). */
+async function brandLogo(): Promise<{ data: string; width: number; height: number } | null> {
+  if (typeof document === "undefined" || typeof Image === "undefined") return null;
+  try {
+    const img = new Image();
+    img.src = logoUrl;
+    await img.decode();
+    const c = document.createElement("canvas");
+    c.width = img.naturalWidth;
+    c.height = img.naturalHeight;
+    const ctx = c.getContext("2d");
+    if (!ctx) return null;
+    ctx.drawImage(img, 0, 0);
+    return { data: c.toDataURL("image/png"), width: c.width, height: c.height };
+  } catch {
+    return null;
+  }
+}
+
 /** PDF report. Chart images (PNG data URLs) are captured from the on-screen preview. */
 export async function reportPdf(model: ReportModel, chartImages: { title: string; png: string; width: number; height: number }[], include: Set<string>): Promise<Blob> {
   const { jsPDF } = await import("jspdf");
@@ -133,7 +153,7 @@ export async function reportPdf(model: ReportModel, chartImages: { title: string
   let y = M;
   const ink: [number, number, number] = [23, 30, 46];
   const soft: [number, number, number] = [92, 102, 122];
-  const accent: [number, number, number] = [59, 79, 216];
+  const accent: [number, number, number] = [15, 85, 224];
 
   const ensure = (h: number) => {
     if (y + h > H - M) {
@@ -174,17 +194,24 @@ export async function reportPdf(model: ReportModel, chartImages: { title: string
     y = ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? y) + 14;
   };
 
-  // Title block
+  // Title block with the INGOVIQ AI logo
   doc.setFillColor(...accent).rect(0, 0, W, 6, "F");
+  const logo = await brandLogo();
+  if (logo) {
+    const lw = 130;
+    const lh = (lw * logo.height) / logo.width;
+    doc.addImage(logo.data, "PNG", M, 24, lw, lh, "ingoviq-logo", "FAST");
+    doc.setFont("helvetica", "bold").setFontSize(9).setTextColor(...accent).text("SMART MIS REPORT", W - M, 24 + lh / 2 + 3, { align: "right" });
+    y = 24 + lh + 34;
+  } else y = 56;
   doc.setFont("helvetica", "bold").setFontSize(20).setTextColor(...ink);
   const titleLines = doc.splitTextToSize(pdfText(model.title), W - 2 * M) as string[];
-  y = 56;
   titleLines.forEach((l) => {
     doc.text(l, M, y);
     y += 24;
   });
   para(`Reporting period: ${model.periodNote}`, 10);
-  para(`Generated ${fmtDate(model.generatedAt.slice(0, 10))} · Smart MIS`, 9);
+  para(`Generated ${fmtDate(model.generatedAt.slice(0, 10))} · Smart MIS by INGOVIQ AI`, 9);
   if (model.filtersNote) para(`Filters applied: ${model.filtersNote}`, 9);
 
   if (include.has("summary")) {
@@ -277,6 +304,7 @@ export async function reportPdf(model: ReportModel, chartImages: { title: string
   for (let p = 1; p <= pages; p++) {
     doc.setPage(p);
     doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(...soft).text(pdfText(`${model.title} · page ${p} of ${pages}`), M, H - 20);
+    doc.text(pdfText("Smart MIS · INGOVIQ AI"), W - M, H - 20, { align: "right" });
   }
   return doc.output("blob");
 }

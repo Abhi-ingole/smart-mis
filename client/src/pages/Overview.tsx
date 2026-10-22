@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowUpRight, BarChart3, FileSpreadsheet, FileText, Lock, ShieldCheck, Sparkles, Upload } from "lucide-react";
 import { useDatasets } from "../state/datasets";
+import markUrl from "../assets/ingoviq-mark.png";
 import { DEMO_FILES, demoJob, useAnalyzer } from "../state/useAnalyzer";
 import { AnalysisProgress } from "../components/AnalysisProgress";
 import { Alert, Fingerprint, Modal, QualityRing } from "../components/ui";
@@ -45,6 +46,10 @@ export default function OverviewPage() {
       <section className={`card relative overflow-hidden ${has ? "px-6 py-8 sm:px-10" : "px-6 py-14 sm:px-12 sm:py-20"}`}>
         <HeroArt />
         <div className="relative max-w-2xl">
+          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-line bg-white py-1 pl-1 pr-3 text-xs font-medium text-ink-soft">
+            <img src={markUrl} alt="" className="h-6 w-6" />
+            Smart MIS by <span className="font-semibold text-brand-navy">INGOVIQ <span className="text-accent">AI</span></span>
+          </p>
           <h1 className={`${has ? "text-2xl sm:text-3xl" : "text-3xl sm:text-5xl"} font-semibold leading-tight tracking-tight`}>Turn any spreadsheet into intelligent insights</h1>
           <p className="mt-4 max-w-xl text-base text-ink-soft sm:text-lg">
             Upload Excel, CSV, JSON or PDF files — or a whole folder or ZIP — and automatically generate interactive dashboards, meaningful KPIs, and professional MIS reports.
