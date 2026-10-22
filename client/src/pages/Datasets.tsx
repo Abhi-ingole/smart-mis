@@ -39,7 +39,7 @@ export default function DatasetsPage() {
     <div className="space-y-5">
       <PageHeader
         title="My datasets"
-        description="Saved in this browser (IndexedDB). Original uploads are kept unchanged; cleaning and column edits are stored as separate steps."
+        description="Open in this tab only — nothing is saved, and these are cleared when you close or reload the page. Original uploads are kept unchanged; cleaning and column edits are stored as separate steps."
         actions={
           <>
             <button className="btn-secondary" disabled={(datasets?.length ?? 0) < 2} onClick={() => setMerging(true)}>

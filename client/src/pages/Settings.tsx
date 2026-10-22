@@ -31,11 +31,11 @@ export default function SettingsPage() {
           <HardDrive className="h-4 w-4 text-accent" /> Data storage
         </h2>
         <p className="mt-2 text-sm text-ink-soft">
-          <strong className="font-medium text-ink">Local-only.</strong> Spreadsheets are parsed in this browser and saved in its IndexedDB storage. They are not uploaded or synced to any server, so they won't appear on other devices or browsers.
+          <strong className="font-medium text-ink">Nothing is saved.</strong> Files are read in this browser tab only. They are never uploaded to a server or stored in any database, and they are cleared when you close or reload the tab. Export a report before closing if you need to keep it.
         </p>
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
           <div className="rounded-lg bg-sunken p-3">
-            <dt className="text-xs text-ink-soft">Datasets saved</dt>
+            <dt className="text-xs text-ink-soft">Datasets open now</dt>
             <dd className="text-lg font-semibold">{datasets?.length ?? "—"}</dd>
           </div>
           <div className="rounded-lg bg-sunken p-3">
@@ -48,7 +48,7 @@ export default function SettingsPage() {
           </div>
         </dl>
         <button className="btn-danger mt-4" disabled={!datasets?.length} onClick={() => setConfirm(true)}>
-          <Trash2 className="h-4 w-4" /> Delete all local data
+          <Trash2 className="h-4 w-4" /> Clear all data now
         </button>
       </section>
 
@@ -82,7 +82,7 @@ export default function SettingsPage() {
           <li>Files up to {LIMITS.maxFileBytes / 1048576} MB, {LIMITS.maxRows.toLocaleString("en-IN")} rows and {LIMITS.maxCols} columns per sheet are analysed in the browser.</li>
           <li>Exports neutralise spreadsheet formulas (cells starting with =, +, - or @) so opening them is safe.</li>
           <li>The original upload is never modified; cleaning steps are stored separately and can be undone.</li>
-          <li>Deleting data here removes it from this browser only. Your files on disk aren't touched.</li>
+          <li>Uploaded data is kept only while this tab is open. Your files on disk are never changed.</li>
         </ul>
       </section>
 
@@ -100,7 +100,7 @@ export default function SettingsPage() {
               onClick={async () => {
                 setConfirm(false);
                 await removeAll();
-                toast("success", "All datasets and settings were deleted from this browser.");
+                toast("success", "All data and settings were cleared.");
               }}
             >
               Delete everything
@@ -108,7 +108,7 @@ export default function SettingsPage() {
           </>
         }
       >
-        <p>All {datasets?.length ?? 0} datasets, dashboards and settings stored in this browser will be permanently removed.</p>
+        <p>All {datasets?.length ?? 0} open datasets, dashboards and settings will be cleared.</p>
       </Modal>
     </div>
   );

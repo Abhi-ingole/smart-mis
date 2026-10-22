@@ -1,6 +1,6 @@
 /**
- * Local-only dataset storage (IndexedDB). Nothing here is sent to any server.
- * Metadata and rows live in separate stores so listing datasets stays fast.
+ * Storage. Nothing here is sent to any server, and uploaded data is not saved:
+ * datasets are held in memory for the current tab only. IndexedDB keeps settings only.
  */
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
 import type { Cell, DatasetMeta, DatasetRecord } from "../engine/types";
@@ -26,42 +26,58 @@ function db() {
   return dbPromise;
 }
 
+/*
+ * Uploaded data is NOT saved anywhere. Datasets live only in this tab's memory and
+ * disappear when the tab is closed or reloaded. Only small preferences (settings)
+ * are kept in IndexedDB. Data that older versions saved in the browser is wiped.
+ */
+const memory = new Map<string, DatasetRecord>();
+
+let purged: Promise<void> | null = null;
+/** Removes datasets that earlier versions stored in IndexedDB (runs once per page load). */
+export function purgeStoredDatasets(): Promise<void> {
+  purged ??= (async () => {
+    try {
+      const d = await db();
+      const tx = d.transaction(["meta", "rows"], "readwrite");
+      await Promise.all([tx.objectStore("meta").clear(), tx.objectStore("rows").clear(), tx.done]);
+    } catch {
+      /* storage blocked (e.g. private window) — nothing was stored then either */
+    }
+  })();
+  return purged;
+}
+if (typeof indexedDB !== "undefined") void purgeStoredDatasets();
+
+const metaOf = ({ rows: _rows, ...meta }: DatasetRecord): DatasetMeta => meta;
+
 export async function listDatasets(): Promise<DatasetMeta[]> {
-  const all = await (await db()).getAll("meta");
-  return all.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  return [...memory.values()].map(metaOf).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
 export async function getDataset(id: string): Promise<DatasetRecord | null> {
-  const d = await db();
-  const [meta, rows] = await Promise.all([d.get("meta", id), d.get("rows", id)]);
-  if (!meta || !rows) return null;
-  return { ...meta, rows: rows.rows };
+  return memory.get(id) ?? null;
 }
 
 export async function saveDataset(record: DatasetRecord): Promise<void> {
-  const { rows, ...meta } = record;
-  const d = await db();
-  const tx = d.transaction(["meta", "rows"], "readwrite");
-  await Promise.all([tx.objectStore("meta").put(meta), tx.objectStore("rows").put({ id: record.id, rows }), tx.done]);
+  memory.set(record.id, record);
 }
 
 /** Updates metadata only (schema, cleaning steps, dashboard…). Rows are never rewritten. */
 export async function updateMeta(id: string, patch: Partial<Omit<DatasetMeta, "id">>): Promise<DatasetMeta> {
-  const d = await db();
-  const current = await d.get("meta", id);
+  const current = memory.get(id);
   if (!current) throw new Error("Dataset not found.");
   const next = { ...current, ...patch, id, updatedAt: new Date().toISOString() };
-  await d.put("meta", next);
-  return next;
+  memory.set(id, next);
+  return metaOf(next);
 }
 
 export async function deleteDataset(id: string): Promise<void> {
-  const d = await db();
-  const tx = d.transaction(["meta", "rows"], "readwrite");
-  await Promise.all([tx.objectStore("meta").delete(id), tx.objectStore("rows").delete(id), tx.done]);
+  memory.delete(id);
 }
 
 export async function deleteAllData(): Promise<void> {
+  memory.clear();
   const d = await db();
   const tx = d.transaction(["meta", "rows", "settings"], "readwrite");
   await Promise.all([tx.objectStore("meta").clear(), tx.objectStore("rows").clear(), tx.objectStore("settings").clear(), tx.done]);
@@ -88,4 +104,5 @@ export async function storageEstimate(): Promise<{ usage: number; quota: number 
 /** For tests: reset the cached connection. */
 export function _resetConnection() {
   dbPromise = null;
+  purged = null;
 }

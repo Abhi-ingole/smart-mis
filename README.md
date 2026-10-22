@@ -13,7 +13,7 @@ Upload **any** Excel, CSV, JSON or PDF-table file — or drop a whole **folder**
 
 It adapts to the data: sales files get revenue and order KPIs, HR files get headcount and attrition, marks sheets get averages and pass rates, and unknown data gets honest descriptive statistics. Nothing is hard-coded per industry, and no number is ever invented.
 
-> **Privacy:** files are parsed and stored **in your browser** (IndexedDB). Nothing is uploaded. AI is optional, off by default, and only ever receives computed summary statistics after you tick a consent box.
+> **Privacy:** files are parsed **in your browser** and kept **only in memory for the open tab** — nothing is uploaded and nothing is saved to any database or browser storage. Closing or reloading the tab clears the data. AI is optional, off by default, and only ever receives computed summary statistics after you tick a consent box.
 
 **Live app:** https://abhi-ingole.github.io/smart-mis/ — free to use. Your files stay in your own browser; the site has no server and no database, so no one (including the site owner) can see what you upload.
 
@@ -106,7 +106,7 @@ In [`samples/`](samples/) — also used by **Explore demo** and the tests:
 - **A–D** upload sales / HR / marks / unknown files → correct domain, KPI values checked against independent calculations, formulas, charts; no invented semantics for unknown data
 - **E** missing values and duplicates → quality warnings and lower score
 - **F** Excel report has Summary, KPIs, Categories, Insights, Data quality and Data sheets with the *same* values as the dashboard; CSV neutralises formulas
-- **G** datasets survive a "refresh" (IndexedDB, via fake-indexeddb)
+- **G** uploaded data is never written to IndexedDB, and data saved by older versions is wiped
 - **H** everything works without AI
 - plus parser edge cases, date/number parsing, ambiguity questions, non-destructive cleaning, grounded insights, guided join, filtered KPIs, Excel dates in several time zones, and server security (consent, origin check, size limit, headers, number grounding)
 
@@ -130,7 +130,7 @@ client/                         React + TypeScript + Vite + Tailwind + Recharts
     pipeline.ts     stages with real progress
     worker.ts       Web Worker entry
   src/export/       PDF (jsPDF + autotable), Excel (SheetJS), CSV
-  src/storage/      Dataset Storage Layer (IndexedDB via idb)
+  src/storage/      In-memory dataset store (per tab); IndexedDB for settings only
   src/state/        React state hooks
   src/components/   UI components (Dashboard Renderer, charts, filters…)
   src/pages/        Overview, Upload, Datasets, Dashboard, ReportBuilder, Insights, DataQuality, Settings
@@ -152,7 +152,7 @@ The first version (kept on the branch **`v1-campaign-mis`**) was a WhatsApp/Emai
 
 ## Security & privacy
 
-- Local processing: spreadsheets are parsed in a Web Worker and stored in IndexedDB; the server never receives them.
+- Local processing: spreadsheets are parsed in a Web Worker and held in memory for the open tab only; nothing is stored, and the server never receives them.
 - File checks before parsing: extension, size (30 MB), row (300,000), column (500) and cell (6 M) limits, and file signatures (real ZIP for .xlsx, OLE/ZIP for .xls, no binary content in CSV).
 - React escapes all displayed text; no `dangerouslySetInnerHTML`.
 - CSV and Excel exports prefix cells starting with `= + - @` so they can't run as formulas.

@@ -18,9 +18,15 @@ interface DatasetsState {
 const Ctx = createContext<DatasetsState | null>(null);
 const ACTIVE_KEY = "smart-mis:active";
 
+try {
+  localStorage.removeItem(ACTIVE_KEY); // left by older versions
+} catch {
+  /* ignore */
+}
+
 function readActive(): string | null {
   try {
-    return localStorage.getItem(ACTIVE_KEY);
+    return sessionStorage.getItem(ACTIVE_KEY);
   } catch {
     return null;
   }
@@ -36,7 +42,7 @@ export function DatasetsProvider({ children }: { children: ReactNode }) {
       setDatasets(await listDatasets());
       setError(null);
     } catch (e) {
-      setError(`Local storage is unavailable (${(e as Error).message}). Private/incognito windows may block it.`);
+      setError(`Couldn't load data (${(e as Error).message}). Private/incognito windows may block it.`);
       setDatasets([]);
     }
   }, []);
@@ -48,8 +54,8 @@ export function DatasetsProvider({ children }: { children: ReactNode }) {
   const setActiveId = useCallback((id: string | null) => {
     setActive(id);
     try {
-      if (id) localStorage.setItem(ACTIVE_KEY, id);
-      else localStorage.removeItem(ACTIVE_KEY);
+      if (id) sessionStorage.setItem(ACTIVE_KEY, id);
+      else sessionStorage.removeItem(ACTIVE_KEY);
     } catch {
       /* ignore */
     }

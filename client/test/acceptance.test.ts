@@ -11,7 +11,8 @@ import { evaluate, loadSample, SAMPLES } from "./helpers";
 import { generateInsights } from "../src/engine/insights";
 import { buildReport } from "../src/engine/report";
 import { reportWorkbook, tableCsv } from "../src/export/exporters";
-import { deleteDataset, getDataset, listDatasets, saveDataset, _resetConnection } from "../src/storage/db";
+import { openDB } from "idb";
+import { deleteDataset, getDataset, listDatasets, purgeStoredDatasets, saveDataset, _resetConnection } from "../src/storage/db";
 
 function readSheet(file: string, sheet?: string): Record<string, unknown>[] {
   const wb = XLSX.read(fs.readFileSync(path.join(SAMPLES, file)), { cellDates: true });
@@ -148,18 +149,34 @@ describe("Test F — report export", () => {
   });
 });
 
-describe("Test G — local persistence", () => {
-  it("keeps datasets after a 'refresh' (new connection)", async () => {
+describe("Test G — uploaded data is never stored", () => {
+  it("keeps datasets in memory only and nothing in IndexedDB", async () => {
     const rec = await loadSample("student-marks.csv");
     await saveDataset(rec);
-    _resetConnection(); // simulates a page reload
-    const list = await listDatasets();
-    expect(list.map((d) => d.id)).toContain(rec.id);
     const back = await getDataset(rec.id);
     expect(back?.rows.length).toBe(rec.rows.length);
-    expect(back?.dashboard.kpis.length).toBe(rec.dashboard.kpis.length);
+    expect((await listDatasets()).map((d) => d.id)).toContain(rec.id);
+
+    const idb = await openDB("smart-mis");
+    expect(await idb.count("meta")).toBe(0);
+    expect(await idb.count("rows")).toBe(0);
+    idb.close();
+
     await deleteDataset(rec.id);
     expect(await getDataset(rec.id)).toBeNull();
+  });
+
+  it("wipes datasets that older versions saved in the browser", async () => {
+    const idb = await openDB("smart-mis");
+    await idb.put("meta", { id: "old", updatedAt: "2026-01-01" });
+    await idb.put("rows", { id: "old", rows: [[1]] });
+    idb.close();
+    _resetConnection();
+    await purgeStoredDatasets();
+    const again = await openDB("smart-mis");
+    expect(await again.count("meta")).toBe(0);
+    expect(await again.count("rows")).toBe(0);
+    again.close();
   });
 });
 

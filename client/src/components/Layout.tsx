@@ -68,7 +68,7 @@ export function Layout({ children }: { children: ReactNode }) {
       )}
       <p className="flex items-start gap-2 text-xs text-ink-faint">
         <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
-        Local-only: your files are processed and stored in this browser.
+        Nothing is saved: files are read in this tab and cleared when you close it.
       </p>
       <p className="text-[11px] text-ink-faint">© {new Date().getFullYear()} INGOVIQ AI</p>
     </div>
