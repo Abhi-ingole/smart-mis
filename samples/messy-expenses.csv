@@ -1,0 +1,195 @@
+Quarterly Expense Register
+
+Expense Date,Department,Category,Amount,Amount,Approved By,Notes
+22/03/2026, Sales ,Meals,17391,,Kabir,=SUM(A1:A9)
+20/01/2026,Sales,Travel,16929,16929,Neel,client visit
+02/02/2026,Finance,Training,13766,,Saanvi,=SUM(A1:A9)
+31/02/2026,,Travel,2336,,Aditya,
+21/02/2026,Engineering,Meals,2086,,,
+10/01/2026,Sales,Training,12473,12473,,
+09/01/2026, Sales ,Meals,4672,4672,Arjun,urgent
+22/03/2026,Engineering,Meals,21726,21726,Aditya,
+06/03/2026,Engineering,Office Supplies,24861,,Reyansh,
+05/01/2026,Engineering,Meals,12212,12212,Tara,client visit
+13/03/2026,Operations,Travel,18607,18607,Myra,renewal
+25/01/2026,Sales,Meals,8584,,Dev,
+25/01/2026,Engineering,Software,13175,13175,,
+16/01/2026,Operations,Software,21559,21559,Reyansh,
+23/02/2026,Sales,Software,14131,14131,Myra,
+09/03/2026,Operations,Training,N/A,10536,Riya,
+08/02/2026,Operations,Training,13775,,Isha,
+08/03/2026,Operations,Training,663,,,
+04/01/2026, Sales ,Office Supplies,N/A,,,renewal
+31/02/2026,Engineering,Travel,12757,,Reyansh,
+17/03/2026, Sales ,Office Supplies,24807,24807,Aditya,
+13/01/2026, Sales ,Office Supplies,4337,4337,Isha,
+05/01/2026,Operations,Office Supplies,N/A,11543,Vivaan,
+04/01/2026,Operations,Office Supplies,6410,6410,Dev,renewal
+21/03/2026,Finance,Software,7879,,Riya,=SUM(A1:A9)
+24/03/2026, Sales ,Travel,23494,,Myra,
+23/01/2026,,Training,21268,21268,Isha,
+20/03/2026, Sales ,Training,20709,,Isha,
+11/01/2026,Engineering,Office Supplies,946,946,Ananya,renewal
+19/01/2026,Operations,Software,16149,16149,Diya,urgent
+26/01/2026,Sales,Travel,2451,,Vivaan,urgent
+04/02/2026,,Office Supplies,11237,,Zoya,
+21/03/2026, Sales ,Travel,4131,,Meera,
+14/03/2026,Sales,Software,7242,,Aarav,urgent
+01/02/2026,Engineering,Training,15557,,Riya,
+08/01/2026,Finance,Software,15604,,Saanvi,renewal
+31/02/2026,Finance,Training,12728,12728,,urgent
+17/03/2026,Sales,Office Supplies,15986,,Tara,
+28/01/2026,Sales,Travel,19660,,Saanvi,
+24/01/2026, Sales ,Software,5490,,,
+05/01/2026,Finance,Training,4007,4007,Saanvi,
+12/02/2026, Sales ,Meals,6749,,,
+23/03/2026,Operations,Travel,4176,4176,Arjun,
+04/02/2026,Finance,Office Supplies,15424,15424,Diya,
+31/02/2026, Sales ,Meals,18902,18902,,client visit
+23/01/2026,Sales,Training,13658,,Tara,
+14/03/2026,Engineering,Software,18052,,Saanvi,=SUM(A1:A9)
+19/03/2026, Sales ,Software,13524,,Kabir,
+01/03/2026,Sales,Office Supplies,20271,20271,Reyansh,
+06/02/2026,Engineering,Training,N/A,23833,Neel,
+31/02/2026,Operations,Meals,2738,2738,Aditya,=SUM(A1:A9)
+10/01/2026,,Meals,2000,2000,Tara,client visit
+31/02/2026,Finance,Software,23077,23077,Diya,client visit
+10/02/2026,Operations,Meals,8490,,Saanvi,
+23/01/2026,Finance,Office Supplies,21155,21155,Dev,
+24/01/2026, Sales ,Office Supplies,4822,,Ishaan,
+11/01/2026, Sales ,Meals,16057,16057,Ishaan,
+17/01/2026, Sales ,Meals,15086,,Tara,
+24/02/2026,Finance,Travel,20730,20730,Aarav,
+05/01/2026, Sales ,Software,15808,15808,Neel,=SUM(A1:A9)
+12/01/2026,Engineering,Software,12323,12323,,
+04/01/2026,Finance,Training,6005,6005,Dev,
+18/01/2026,Operations,Office Supplies,N/A,9906,Myra,
+24/03/2026,Finance,Software,739,739,,
+17/02/2026,Sales,Travel,1761,,,
+13/03/2026,,Office Supplies,18440,,Aditya,
+19/02/2026,Finance,Meals,5268,,,urgent
+25/03/2026, Sales ,Office Supplies,16829,16829,Saanvi,
+08/01/2026, Sales ,Travel,12311,,Myra,
+15/01/2026,Operations,Travel,18074,18074,Meera,
+25/03/2026,Engineering,Training,19496,,Vivaan,
+22/03/2026,Operations,Software,636,,Aarav,
+25/01/2026,Engineering,Office Supplies,19075,19075,Ananya,
+01/03/2026,,Meals,17965,17965,Aditya,
+31/02/2026, Sales ,Meals,1727,1727,,
+22/01/2026,Operations,Training,9967,,Ananya,
+26/02/2026,Operations,Travel,3913,,,
+07/01/2026,Sales,Training,19049,19049,Kiara,
+31/02/2026,,Training,12804,12804,Arjun,
+03/01/2026,Sales,Travel,N/A,,Kabir,renewal
+05/03/2026,Sales,Software,8818,,Isha,
+27/02/2026,Engineering,Software,14193,14193,Isha,
+23/01/2026,Sales,Meals,15623,15623,Ananya,
+24/02/2026,Operations,Travel,7631,,Reyansh,
+31/02/2026, Sales ,Meals,18521,18521,Aditya,client visit
+31/02/2026,Finance,Office Supplies,10678,,Diya,
+14/01/2026,Finance,Meals,4765,4765,,
+13/01/2026,Operations,Office Supplies,18308,,,=SUM(A1:A9)
+19/02/2026,Operations,Software,15573,15573,Aarav,urgent
+15/02/2026,Sales,Office Supplies,7049,,Riya,
+10/01/2026,,Office Supplies,N/A,9579,Meera,
+04/03/2026,Engineering,Travel,8081,8081,,
+05/02/2026,Operations,Office Supplies,9283,9283,Zoya,
+25/01/2026,Engineering,Travel,12102,,Meera,
+12/02/2026,Finance,Travel,21545,21545,Meera,=SUM(A1:A9)
+20/03/2026,Sales,Training,9433,9433,Zoya,
+09/02/2026,Operations,Meals,21199,21199,Ananya,
+19/01/2026,Finance,Office Supplies,N/A,2807,Aarav,
+09/02/2026,Engineering,Training,17514,,Ishaan,urgent
+08/02/2026, Sales ,Office Supplies,8984,8984,Kiara,=SUM(A1:A9)
+02/03/2026,Operations,Software,14985,14985,,
+18/01/2026,Finance,Training,22654,,Aditya,=SUM(A1:A9)
+05/03/2026, Sales ,Training,8056,,,
+16/03/2026,Finance,Travel,15890,15890,Arjun,client visit
+20/02/2026,Finance,Office Supplies,23496,23496,Diya,
+03/03/2026,,Meals,15606,15606,Saanvi,
+07/03/2026,Finance,Training,19308,,Isha,=SUM(A1:A9)
+10/01/2026,Sales,Travel,19275,19275,Dev,
+05/01/2026,Finance,Office Supplies,17341,17341,Rohan,
+01/03/2026,,Office Supplies,6240,6240,Aarav,
+31/02/2026,Finance,Meals,17528,17528,Neel,
+02/02/2026, Sales ,Travel,13787,13787,Isha,
+12/03/2026,Finance,Office Supplies,24573,,,client visit
+01/02/2026,Engineering,Meals,1216,1216,Kiara,
+31/02/2026,Engineering,Travel,13814,,Isha,
+10/02/2026, Sales ,Office Supplies,2733,2733,Ishaan,urgent
+06/03/2026,Finance,Software,5653,5653,Ananya,urgent
+31/02/2026, Sales ,Training,10623,,Ishaan,
+28/03/2026,Operations,Training,24809,24809,Ishaan,
+16/01/2026, Sales ,Office Supplies,3330,3330,Aarav,
+02/03/2026,Engineering,Training,6733,,Myra,client visit
+15/01/2026,Operations,Training,23760,23760,Neel,urgent
+19/03/2026,Engineering,Software,17097,,,client visit
+05/01/2026,Finance,Software,9969,9969,Zoya,client visit
+27/02/2026,,Meals,1036,,,
+26/01/2026,Sales,Meals,19568,19568,Arjun,
+14/03/2026,Sales,Office Supplies,18943,18943,Meera,
+10/02/2026,Finance,Office Supplies,14179,14179,Tara,
+20/02/2026,Finance,Software,21083,,Neel,
+24/01/2026, Sales ,Office Supplies,7868,7868,Aarav,
+26/01/2026,Operations,Travel,18621,18621,Meera,client visit
+19/01/2026,,Software,17008,17008,,
+27/03/2026, Sales ,Meals,9353,,Ishaan,urgent
+03/03/2026,Finance,Meals,15288,,Diya,
+20/02/2026,Operations,Travel,7302,,Ananya,client visit
+12/03/2026, Sales ,Meals,2860,,Meera,
+23/03/2026,Finance,Software,N/A,20418,,
+28/01/2026,Operations,Software,5703,5703,Reyansh,urgent
+13/02/2026, Sales ,Training,18270,18270,Ananya,
+07/02/2026,Finance,Office Supplies,8605,8605,,renewal
+03/02/2026,Sales,Travel,4420,4420,Riya,
+10/01/2026,,Meals,N/A,3286,Riya,
+23/01/2026,Operations,Training,22098,,Kiara,
+05/01/2026,Engineering,Travel,10220,,,urgent
+07/03/2026,Operations,Meals,5592,5592,Arjun,
+07/03/2026,,Office Supplies,1169,1169,Riya,renewal
+15/02/2026, Sales ,Software,24777,,Kiara,
+14/01/2026,Engineering,Meals,1606,1606,Rohan,=SUM(A1:A9)
+16/02/2026, Sales ,Office Supplies,N/A,3415,Saanvi,
+11/02/2026,Finance,Travel,18507,18507,Arjun,urgent
+05/01/2026,Finance,Office Supplies,6665,,Dev,
+02/02/2026,Finance,Travel,14745,,Neel,
+17/03/2026, Sales ,Software,19973,,Riya,
+02/02/2026,,Training,23464,,Neel,
+24/02/2026, Sales ,Software,21618,21618,Neel,renewal
+27/01/2026,Operations,Meals,5125,,Dev,urgent
+25/03/2026,Finance,Software,16220,16220,Riya,
+25/01/2026,Sales,Travel,15777,,Zoya,=SUM(A1:A9)
+26/01/2026, Sales ,Software,19442,,,
+04/02/2026,Sales,Office Supplies,17787,,Zoya,client visit
+07/03/2026, Sales ,Training,13037,13037,Isha,
+11/02/2026,Engineering,Training,20747,,Ishaan,
+13/01/2026,Sales,Meals,6369,,,
+13/03/2026, Sales ,Software,20905,,Ananya,
+22/02/2026,Engineering,Training,5807,,,
+05/01/2026,Sales,Travel,N/A,,Diya,client visit
+16/02/2026,,Travel,4301,4301,Rohan,renewal
+05/02/2026,,Training,11370,11370,Ananya,
+19/03/2026,Engineering,Travel,24509,,,renewal
+01/01/2026,Engineering,Travel,13295,,Meera,renewal
+06/01/2026,Engineering,Software,24150,24150,Reyansh,renewal
+24/01/2026, Sales ,Office Supplies,1996,,Ishaan,
+10/03/2026,Sales,Meals,20670,20670,Isha,=SUM(A1:A9)
+23/03/2026,Sales,Office Supplies,850,850,Arjun,
+27/01/2026,Operations,Travel,18093,,Aditya,
+22/01/2026,Finance,Office Supplies,16086,,Kabir,
+22/02/2026,,Office Supplies,7813,7813,Arjun,urgent
+16/03/2026,Finance,Office Supplies,7137,7137,Aditya,
+21/03/2026,Finance,Office Supplies,21562,21562,Tara,client visit
+08/01/2026, Sales ,Training,12451,12451,Ananya,
+02/03/2026,Operations,Software,14985,14985,,
+08/02/2026,Operations,Training,13775,,Isha,
+22/02/2026,,Office Supplies,7813,7813,Arjun,urgent
+09/03/2026,Operations,Training,N/A,10536,Riya,
+28/03/2026,Operations,Training,24809,24809,Ishaan,
+26/02/2026,Operations,Travel,3913,,,
+10/01/2026,,Meals,N/A,3286,Riya,
+08/02/2026,Operations,Training,13775,,Isha,
+22/03/2026,Operations,Software,636,,Aarav,
+22/02/2026,Engineering,Training,5807,,,
+20/03/2026, Sales ,Training,20709,,Isha,
+02/03/2026,Operations,Software,14985,14985,,
