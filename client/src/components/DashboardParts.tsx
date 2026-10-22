@@ -1,11 +1,37 @@
 import { useState } from "react";
-import { ArrowDownRight, ArrowUpRight, Info, Minus, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import type { Agg, ChartSpec, ChartType, ColumnSchema, KpiDef, KpiValue, Table } from "../engine/types";
-import { compatibleTypes } from "../engine/charts";
+import { ArrowDownRight, ArrowUpRight, Info, Minus, Pencil, Trash2 } from "lucide-react";
+import type { Agg, ColumnSchema, KpiDef, KpiValue } from "../engine/types";
 import { isNumericType } from "../engine/table";
 import { fmtPercent } from "../engine/format";
-import { ChartView } from "./ChartView";
 import { Field, Modal } from "./ui";
+
+export { ChartCard, ChartEditor } from "./ChartCard";
+
+/** Tiny trend line for a KPI (one point per period). */
+function Sparkline({ points }: { points: { label: string; value: number | null }[] }) {
+  const vals = points.map((p) => p.value).filter((v): v is number => v !== null);
+  if (vals.length < 3) return null;
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  const w = 120;
+  const h = 32;
+  const step = w / (points.length - 1);
+  const y = (v: number) => (max === min ? h / 2 : h - 3 - ((v - min) / (max - min)) * (h - 6));
+  let d = "";
+  points.forEach((p, i) => {
+    if (p.value === null) return;
+    d += `${d ? "L" : "M"}${(i * step).toFixed(1)},${y(p.value).toFixed(1)}`;
+  });
+  const last = points[points.length - 1];
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="mt-2 h-8 w-full" preserveAspectRatio="none" role="img" aria-label={`Trend over ${points.length} periods, ${points[0].label} to ${last.label}`}>
+      <title>{points.map((p) => `${p.label}: ${p.value ?? "—"}`).join("\n")}</title>
+      <path d={`${d}L${w},${h}L0,${h}Z`} fill="var(--color-accent)" opacity={0.08} />
+      <path d={d} fill="none" stroke="var(--color-accent)" strokeWidth={1.6} vectorEffect="non-scaling-stroke" />
+      {last.value !== null && <circle cx={w} cy={y(last.value)} r={2.5} fill="var(--color-accent)" />}
+    </svg>
+  );
+}
 
 export function KpiCard({ def, value, onRemove, onRename }: { def: KpiDef; value?: KpiValue; onRemove?: () => void; onRename?: (name: string) => void }) {
   const [info, setInfo] = useState(false);
@@ -48,6 +74,7 @@ export function KpiCard({ def, value, onRemove, onRename }: { def: KpiDef; value
           <span className="font-normal text-ink-faint">· {c.label}</span>
         </p>
       )}
+      {value?.trend && <Sparkline points={value.trend} />}
       {info && value && (
         <div className="mt-3 space-y-1 rounded-lg bg-sunken p-2.5 text-xs text-ink-soft">
           <p>
@@ -62,171 +89,6 @@ export function KpiCard({ def, value, onRemove, onRename }: { def: KpiDef; value
         </div>
       )}
     </div>
-  );
-}
-
-const AGG_OPTIONS: { value: ChartSpec["agg"]; label: string }[] = [
-  { value: "sum", label: "Total" },
-  { value: "avg", label: "Average" },
-  { value: "count", label: "Count of rows" },
-  { value: "median", label: "Median" },
-  { value: "min", label: "Minimum" },
-  { value: "max", label: "Maximum" },
-];
-const TYPE_NAMES: Record<ChartType, string> = { bar: "Bar", line: "Line", area: "Area", pie: "Pie", donut: "Donut", scatter: "Scatter", histogram: "Histogram", stacked: "Stacked bar", heatmap: "Heatmap", table: "Table" };
-
-export function ChartCard({ spec, table, rows, onChange, onRemove, wide }: { spec: ChartSpec; table: Table; rows: number[]; onChange: (s: ChartSpec) => void; onRemove: () => void; wide?: boolean }) {
-  const [menu, setMenu] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const types = compatibleTypes(spec, table.schema);
-  return (
-    <section className={`card print-avoid flex min-w-0 flex-col p-4 ${wide ? "lg:col-span-2" : ""}`} data-chart-id={spec.id}>
-      <div className="mb-3 flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <h3 className="truncate font-semibold" title={spec.title}>
-            {spec.title}
-          </h3>
-          <p className="truncate text-xs text-ink-faint" title={spec.reason}>
-            {spec.reason}
-          </p>
-        </div>
-        <div className="no-print relative flex shrink-0 items-center gap-1">
-          {types.length > 1 && (
-            <select className="input w-auto py-1 text-xs" value={spec.type} aria-label="Chart type" onChange={(e) => onChange({ ...spec, type: e.target.value as ChartType })}>
-              {types.map((t) => (
-                <option key={t} value={t}>
-                  {TYPE_NAMES[t]}
-                </option>
-              ))}
-            </select>
-          )}
-          <button className="rounded p-1.5 text-ink-faint hover:bg-sunken hover:text-ink" aria-label="Chart options" aria-expanded={menu} onClick={() => setMenu(!menu)}>
-            <MoreHorizontal className="h-4 w-4" />
-          </button>
-          {menu && (
-            <>
-              <button className="fixed inset-0 z-30 cursor-default" aria-label="Close menu" onClick={() => setMenu(false)} />
-              <div className="absolute right-0 top-8 z-40 w-44 rounded-xl border border-line bg-surface p-1 text-sm" style={{ boxShadow: "var(--shadow-pop)" }}>
-                <button className="w-full rounded px-3 py-2 text-left hover:bg-sunken" onClick={() => (setEditing(true), setMenu(false))}>
-                  Customise chart
-                </button>
-                <button className="w-full rounded px-3 py-2 text-left text-bad hover:bg-bad-soft" onClick={() => (onRemove(), setMenu(false))}>
-                  Remove chart
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-      <ChartView spec={spec} table={table} rows={rows} />
-      <ChartEditor open={editing} spec={spec} schema={table.schema} onClose={() => setEditing(false)} onSave={(s) => (onChange(s), setEditing(false))} />
-    </section>
-  );
-}
-
-/** Add or customise a chart. Only offers combinations that make sense for the column types. */
-export function ChartEditor({ open, spec, schema, onClose, onSave }: { open: boolean; spec?: ChartSpec; schema: ColumnSchema[]; onClose: () => void; onSave: (s: ChartSpec) => void }) {
-  const visible = schema.filter((c) => !c.excluded);
-  const measures = visible.filter((c) => isNumericType(c));
-  const dims = visible.filter((c) => c.role === "dimension" || c.type === "category" || c.type === "boolean");
-  const dates = visible.filter((c) => c.type === "date");
-  const [draft, setDraft] = useState<ChartSpec>(
-    spec ?? { id: `ch-${Date.now().toString(36)}`, type: "bar", title: "", x: dims[0]?.key ?? dates[0]?.key, y: measures[0]?.key, agg: measures[0] ? "sum" : "count", reason: "Added by you." },
-  );
-  const set = (p: Partial<ChartSpec>) => setDraft((d) => ({ ...d, ...p }));
-  const kind: "category" | "time" | "numeric" | "pair" | "table" =
-    draft.type === "table" ? "table" : draft.type === "scatter" ? "pair" : draft.type === "histogram" ? "numeric" : draft.type === "line" || draft.type === "area" ? "time" : "category";
-  const xOptions = kind === "time" ? dates : kind === "numeric" || kind === "pair" ? measures : [...dims, ...dates];
-  const name = (k?: string) => schema.find((c) => c.key === k)?.name ?? "";
-  const autoTitle = () => {
-    if (draft.type === "table") return "Data preview";
-    if (draft.type === "histogram") return `Distribution of ${name(draft.x)}`;
-    if (draft.type === "scatter") return `${name(draft.y)} vs ${name(draft.x)}`;
-    const m = draft.agg === "count" || !draft.y ? "Rows" : `${AGG_OPTIONS.find((a) => a.value === draft.agg)?.label} ${name(draft.y)}`;
-    return `${m} by ${name(draft.x)}${draft.series ? ` and ${name(draft.series)}` : ""}`;
-  };
-  const valid = kind === "table" || (draft.x && (kind !== "pair" || draft.y) && (!["stacked", "heatmap"].includes(draft.type) || draft.series));
-  const invalidShare = (draft.type === "pie" || draft.type === "donut" || draft.type === "stacked") && !(draft.agg === "sum" || draft.agg === "count");
-
-  return (
-    <Modal
-      open={open}
-      title={spec ? "Customise chart" : "Add a chart"}
-      onClose={onClose}
-      footer={
-        <>
-          <button className="btn-secondary" onClick={onClose}>
-            Cancel
-          </button>
-          <button className="btn-primary" disabled={!valid || invalidShare} onClick={() => onSave({ ...draft, title: draft.title.trim() || autoTitle(), y: draft.agg === "count" && kind !== "pair" ? undefined : draft.y })}>
-            {spec ? "Save chart" : "Add chart"}
-          </button>
-        </>
-      }
-    >
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Chart type" htmlFor="ct">
-          <select id="ct" className="input" value={draft.type} onChange={(e) => set({ type: e.target.value as ChartType, x: undefined, series: undefined })}>
-            {(Object.keys(TYPE_NAMES) as ChartType[]).map((t) => (
-              <option key={t} value={t}>
-                {TYPE_NAMES[t]}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field label="Title" htmlFor="cti" hint="Leave empty for an automatic title">
-          <input id="cti" className="input" value={draft.title} maxLength={100} onChange={(e) => set({ title: e.target.value })} placeholder={autoTitle()} />
-        </Field>
-        {kind !== "table" && (
-          <Field label={kind === "time" ? "Date column" : kind === "numeric" ? "Numeric column" : kind === "pair" ? "X axis (numeric)" : "Group by"} htmlFor="cx">
-            <select id="cx" className="input" value={draft.x ?? ""} onChange={(e) => set({ x: e.target.value || undefined })}>
-              <option value="">Choose…</option>
-              {xOptions.map((c) => (
-                <option key={c.key} value={c.key}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </Field>
-        )}
-        {(kind === "category" || kind === "time") && (
-          <Field label="Calculate" htmlFor="ca">
-            <select id="ca" className="input" value={draft.agg} onChange={(e) => set({ agg: e.target.value as ChartSpec["agg"] })}>
-              {AGG_OPTIONS.filter((a) => a.value === "count" || measures.length).map((a) => (
-                <option key={a.value} value={a.value}>
-                  {a.label}
-                </option>
-              ))}
-            </select>
-          </Field>
-        )}
-        {((kind === "category" || kind === "time") && draft.agg !== "count") || kind === "pair" ? (
-          <Field label={kind === "pair" ? "Y axis (numeric)" : "Of column"} htmlFor="cy">
-            <select id="cy" className="input" value={draft.y ?? ""} onChange={(e) => set({ y: e.target.value || undefined })}>
-              <option value="">Choose…</option>
-              {measures.map((c) => (
-                <option key={c.key} value={c.key}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </Field>
-        ) : null}
-        {(draft.type === "stacked" || draft.type === "heatmap") && (
-          <Field label="Split by" htmlFor="cs">
-            <select id="cs" className="input" value={draft.series ?? ""} onChange={(e) => set({ series: e.target.value || undefined })}>
-              <option value="">Choose…</option>
-              {dims.filter((c) => c.key !== draft.x).map((c) => (
-                <option key={c.key} value={c.key}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </Field>
-        )}
-      </div>
-      {invalidShare && <p className="mt-3 text-sm text-warn">Pie, donut and stacked charts show shares of a whole, so they need “Total” or “Count”.</p>}
-    </Modal>
   );
 }
 

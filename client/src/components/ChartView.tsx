@@ -1,19 +1,35 @@
 import { useMemo } from "react";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from "recharts";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, LabelList, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, Treemap, XAxis, YAxis, ZAxis } from "recharts";
 import type { ChartSpec, ColumnSchema, Table } from "../engine/types";
-import { buildChartData } from "../engine/charts";
+import { buildChartData, chartDataTable, type ChartData } from "../engine/charts";
 import { fmtCompact, fmtNumber, fmtValue } from "../engine/format";
 
 export const PALETTE = ["#3b4fd8", "#0e9f8e", "#e0802a", "#a23bc7", "#2f8fd8", "#c94a6b", "#6b8f1d", "#7a5af0"];
 const AXIS = { fontSize: 11, fill: "var(--color-ink-faint)" };
 const TOOLTIP = { contentStyle: { borderRadius: 8, border: "1px solid var(--color-line)", fontSize: 12, boxShadow: "var(--shadow-card)" } };
+const short = (v: string, n = 12) => (v.length > n ? v.slice(0, n - 1) + "…" : v);
+/** Category axis: tilt labels when there are many or long ones so they never overlap. */
+function catAxis(labels: string[]) {
+  const longest = labels.reduce((m, l) => Math.max(m, Math.min(l.length, 14)), 0);
+  const tilt = labels.length * longest > 48;
+  return tilt
+    ? { interval: 0 as const, angle: -30, textAnchor: "end" as const, height: 30 + longest * 4.2, tickFormatter: (v: string) => short(String(v), 14) }
+    : { interval: 0 as const, tickFormatter: (v: string) => short(String(v), 14) };
+}
 
-export function ChartView({ spec, table, rows, height = 260, animate = true }: { spec: ChartSpec; table: Table; rows: number[]; height?: number; animate?: boolean }) {
-  const data = useMemo(() => buildChartData(spec, table, rows), [spec, table, rows]);
-  const yCol: ColumnSchema | undefined = table.schema.find((c) => c.key === spec.y);
+export function useChartData(spec: ChartSpec, table: Table, rows: number[]) {
+  return useMemo(() => buildChartData(spec, table, rows), [spec, table, rows]);
+}
+
+export function ChartView({ spec, table, rows, height = 260, animate = true, data: given }: { spec: ChartSpec; table: Table; rows: number[]; height?: number; animate?: boolean; data?: ChartData }) {
+  const computed = useChartData(spec, table, rows);
+  const data = given ?? computed;
+  const yCol: ColumnSchema | undefined = table.schema.find((c) => c.key === (spec.y ?? spec.measures?.[0]));
   const xCol: ColumnSchema | undefined = table.schema.find((c) => c.key === spec.x);
   const fmtY = (v: number) => (yCol && spec.agg !== "count" ? fmtValue(v, yCol) : fmtNumber(v));
   const anim = animate ? undefined : false;
+  const opt = spec.options ?? {};
+  const labelFmt = (v: unknown) => (typeof v === "number" ? fmtCompact(v) : "");
 
   if (data.kind === "empty") return <div className="flex items-center justify-center text-sm text-ink-faint" style={{ height }}>{data.message}</div>;
 
@@ -50,6 +66,41 @@ export function ChartView({ spec, table, rows, height = 260, animate = true }: {
   }
 
   const note = "note" in data && data.note ? <p className="mt-2 text-xs text-ink-faint">{data.note}</p> : null;
+
+  // Table view of the chart's own numbers
+  if (opt.asTable || spec.type === "table") {
+    const t = chartDataTable(data);
+    if (!t) return null;
+    return (
+      <div>
+        <div className="overflow-auto rounded-lg border border-line" style={{ maxHeight: height + 40 }}>
+          <table className="table">
+            <thead>
+              <tr>
+                {t.headers.map((h, i) => (
+                  <th key={i} className={`whitespace-nowrap ${i ? "text-right" : ""}`}>
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {t.rows.map((r, i) => (
+                <tr key={i}>
+                  {r.map((v, j) => (
+                    <td key={j} className={j ? "text-right tabular-nums" : "max-w-[14rem] truncate"}>
+                      {v === null ? "—" : typeof v === "number" ? (data.kind === "scatter" ? fmtNumber(v) : fmtY(v)) : v}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {note}
+      </div>
+    );
+  }
 
   if (data.kind === "scatter") {
     return (
@@ -112,18 +163,19 @@ export function ChartView({ spec, table, rows, height = 260, animate = true }: {
         </div>
       );
     }
+    // stacked (or grouped columns when the type is "column")
     const rowsData = data.rows.map((r, i) => Object.fromEntries([["label", r], ...data.cols.map((c, j) => [c, data.values[i][j] ?? 0])]));
     return (
       <div>
         <ResponsiveContainer width="100%" height={height}>
-          <BarChart data={rowsData} margin={{ top: 8, right: 8, bottom: 4, left: 4 }}>
+          <BarChart data={rowsData} margin={{ top: 16, right: 8, bottom: 4, left: 4 }}>
             <CartesianGrid vertical={false} stroke="var(--color-line)" />
-            <XAxis dataKey="label" tick={AXIS} interval={0} tickFormatter={(v: string) => (v.length > 12 ? v.slice(0, 11) + "…" : v)} />
+            <XAxis dataKey="label" tick={AXIS} {...catAxis(data.rows)} />
             <YAxis tick={AXIS} tickFormatter={fmtCompact} width={52} />
             <Tooltip {...TOOLTIP} formatter={(v) => fmtY(Number(v))} />
-            <Legend wrapperStyle={{ fontSize: 11 }} />
+            <Legend wrapperStyle={{ fontSize: 11 }} iconType="circle" />
             {data.cols.map((c, j) => (
-              <Bar key={c} dataKey={c} stackId="s" fill={PALETTE[j % PALETTE.length]} isAnimationActive={anim} />
+              <Bar key={c} dataKey={c} stackId={spec.type === "stacked" ? "s" : undefined} fill={PALETTE[j % PALETTE.length]} radius={spec.type === "stacked" ? 0 : [3, 3, 0, 0]} isAnimationActive={anim} />
             ))}
           </BarChart>
         </ResponsiveContainer>
@@ -132,8 +184,74 @@ export function ChartView({ spec, table, rows, height = 260, animate = true }: {
     );
   }
 
-  // Series charts
+  // Several measures (grouped columns, horizontal bars, lines, areas or stacked)
+  if (data.kind === "multi") {
+    const rowsData = data.labels.map((l, i) => Object.fromEntries([["label", l], ...data.series.map((s) => [s.key, s.values[i]])]));
+    const legend = <Legend wrapperStyle={{ fontSize: 11 }} iconType="circle" verticalAlign="top" align="left" height={28} />;
+    const tip = <Tooltip {...TOOLTIP} cursor={{ fill: "var(--color-sunken)" }} formatter={(v, name) => [v === null || v === undefined ? "no data" : fmtY(Number(v)), name]} />;
+    const horizontal = spec.type === "bar";
+    const lineLike = spec.type === "line" || spec.type === "area";
+    return (
+      <div>
+        <ResponsiveContainer width="100%" height={horizontal ? Math.max(height, data.labels.length * data.series.length * 14 + 60) : height}>
+          {lineLike ? (
+            spec.type === "line" ? (
+              <LineChart data={rowsData} margin={{ top: 4, right: 12, bottom: 4, left: 4 }}>
+                <CartesianGrid vertical={false} stroke="var(--color-line)" />
+                <XAxis dataKey="label" tick={AXIS} minTickGap={16} />
+                <YAxis tick={AXIS} tickFormatter={fmtCompact} width={52} />
+                {tip}
+                {legend}
+                {data.series.map((s, i) => (
+                  <Line key={s.key} dataKey={s.key} name={s.name} stroke={PALETTE[i % PALETTE.length]} strokeWidth={2} dot={opt.dots ?? data.labels.length <= 24 ? { r: 3 } : false} isAnimationActive={anim}>
+                    {opt.labels && <LabelList dataKey={s.key} position="top" fontSize={10} formatter={labelFmt} />}
+                  </Line>
+                ))}
+              </LineChart>
+            ) : (
+              <AreaChart data={rowsData} margin={{ top: 4, right: 12, bottom: 4, left: 4 }}>
+                <CartesianGrid vertical={false} stroke="var(--color-line)" />
+                <XAxis dataKey="label" tick={AXIS} minTickGap={16} />
+                <YAxis tick={AXIS} tickFormatter={fmtCompact} width={52} />
+                {tip}
+                {legend}
+                {data.series.map((s, i) => (
+                  <Area key={s.key} dataKey={s.key} name={s.name} stroke={PALETTE[i % PALETTE.length]} fill={PALETTE[i % PALETTE.length]} fillOpacity={0.12} strokeWidth={2} dot={opt.dots ?? data.labels.length <= 24 ? { r: 3 } : false} isAnimationActive={anim} />
+                ))}
+              </AreaChart>
+            )
+          ) : (
+            <BarChart data={rowsData} layout={horizontal ? "vertical" : "horizontal"} margin={{ top: 4, right: 16, bottom: 4, left: 4 }}>
+              <CartesianGrid vertical={horizontal} horizontal={!horizontal} stroke="var(--color-line)" />
+              {horizontal ? (
+                <>
+                  <XAxis type="number" tick={AXIS} tickFormatter={fmtCompact} />
+                  <YAxis type="category" dataKey="label" tick={AXIS} width={110} tickFormatter={(v: string) => short(v, 16)} />
+                </>
+              ) : (
+                <>
+                  <XAxis dataKey="label" tick={AXIS} {...catAxis(data.labels)} />
+                  <YAxis tick={AXIS} tickFormatter={fmtCompact} width={52} />
+                </>
+              )}
+              {tip}
+              {legend}
+              {data.series.map((s, i) => (
+                <Bar key={s.key} dataKey={s.key} name={s.name} stackId={spec.type === "stacked" ? "s" : undefined} fill={PALETTE[i % PALETTE.length]} radius={spec.type === "stacked" ? 0 : horizontal ? [0, 3, 3, 0] : [3, 3, 0, 0]} maxBarSize={36} isAnimationActive={anim}>
+                  {opt.labels && spec.type !== "stacked" && <LabelList dataKey={s.key} position={horizontal ? "right" : "top"} fontSize={10} formatter={labelFmt} />}
+                </Bar>
+              ))}
+            </BarChart>
+          )}
+        </ResponsiveContainer>
+        {note}
+      </div>
+    );
+  }
+
+  // ── Single series ──
   const points = data.points.map((p) => ({ label: p.label, value: p.value }));
+
   if (spec.type === "pie" || spec.type === "donut") {
     const total = points.reduce((a, p) => a + (p.value ?? 0), 0) || 1;
     return (
@@ -141,7 +259,17 @@ export function ChartView({ spec, table, rows, height = 260, animate = true }: {
         <div className="w-full sm:w-1/2" style={{ height }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie data={points} dataKey="value" nameKey="label" innerRadius={spec.type === "donut" ? "58%" : 0} outerRadius="88%" paddingAngle={1} isAnimationActive={anim}>
+              <Pie
+                data={points}
+                dataKey="value"
+                nameKey="label"
+                innerRadius={spec.type === "donut" ? "58%" : 0}
+                outerRadius="88%"
+                paddingAngle={1}
+                isAnimationActive={anim}
+                label={opt.labels ? ({ percent }: { percent?: number }) => `${((percent ?? 0) * 100).toFixed(0)}%` : false}
+                labelLine={false}
+              >
                 {points.map((_, i) => (
                   <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
                 ))}
@@ -153,7 +281,7 @@ export function ChartView({ spec, table, rows, height = 260, animate = true }: {
         <ul className="w-full space-y-1.5 text-sm sm:w-1/2">
           {points.map((p, i) => (
             <li key={p.label} className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: PALETTE[i % PALETTE.length] }} />
+              <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: PALETTE[i % PALETTE.length] }} />
               <span className="min-w-0 flex-1 truncate" title={p.label}>
                 {p.label}
               </span>
@@ -166,55 +294,100 @@ export function ChartView({ spec, table, rows, height = 260, animate = true }: {
     );
   }
 
+  if (spec.type === "treemap") {
+    const total = points.reduce((a, p) => a + Math.max(0, p.value ?? 0), 0) || 1;
+    const tm = points.filter((p) => (p.value ?? 0) > 0).map((p, i) => ({ name: p.label, size: p.value ?? 0, fill: PALETTE[i % PALETTE.length] }));
+    return (
+      <div>
+        <ResponsiveContainer width="100%" height={height}>
+          <Treemap data={tm} dataKey="size" nameKey="name" stroke="#fff" isAnimationActive={anim} content={<TreemapCell total={total} />}>
+            <Tooltip {...TOOLTIP} formatter={(v) => fmtY(Number(v))} />
+          </Treemap>
+        </ResponsiveContainer>
+        {note}
+      </div>
+    );
+  }
+
   const isTime = xCol?.type === "date";
-  const longLabels = !isTime && spec.type === "bar" && (points.length > 6 || points.some((p) => p.label.length > 10));
-  if (spec.type === "bar" && longLabels) {
+  if (spec.type === "bar") {
     const h = Math.max(height, points.length * 28 + 20);
     return (
       <div>
         <ResponsiveContainer width="100%" height={h}>
-          <BarChart data={points} layout="vertical" margin={{ top: 4, right: 16, bottom: 4, left: 4 }}>
+          <BarChart data={points} layout="vertical" margin={{ top: 4, right: opt.labels ? 48 : 16, bottom: 4, left: 4 }}>
             <CartesianGrid horizontal={false} stroke="var(--color-line)" />
             <XAxis type="number" tick={AXIS} tickFormatter={fmtCompact} />
-            <YAxis type="category" dataKey="label" tick={AXIS} width={120} tickFormatter={(v: string) => (v.length > 18 ? v.slice(0, 17) + "…" : v)} />
+            <YAxis type="category" dataKey="label" tick={AXIS} width={120} tickFormatter={(v: string) => short(v, 18)} />
             <Tooltip {...TOOLTIP} cursor={{ fill: "var(--color-sunken)" }} formatter={(v) => [fmtY(Number(v)), data.yLabel]} />
-            <Bar dataKey="value" fill={PALETTE[0]} radius={[0, 4, 4, 0]} maxBarSize={22} isAnimationActive={anim} />
+            <Bar dataKey="value" fill={PALETTE[0]} radius={[0, 4, 4, 0]} maxBarSize={22} isAnimationActive={anim}>
+              {opt.labels && <LabelList dataKey="value" position="right" fontSize={10} formatter={labelFmt} />}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
         {note}
       </div>
     );
   }
-  const common = { data: points, margin: { top: 8, right: 12, bottom: 4, left: 4 } };
+  const common = { data: points, margin: { top: opt.labels ? 18 : 8, right: 12, bottom: 4, left: 4 } };
   const axes = (
     <>
       <CartesianGrid vertical={false} stroke="var(--color-line)" />
-      <XAxis dataKey="label" tick={AXIS} minTickGap={16} />
+      {isTime || spec.type === "histogram" ? <XAxis dataKey="label" tick={AXIS} minTickGap={16} interval="preserveStartEnd" /> : <XAxis dataKey="label" tick={AXIS} {...catAxis(points.map((p) => p.label))} />}
       <YAxis tick={AXIS} tickFormatter={fmtCompact} width={52} />
       <Tooltip {...TOOLTIP} cursor={{ fill: "var(--color-sunken)" }} formatter={(v) => [v === null || v === undefined ? "no data" : fmtY(Number(v)), data.yLabel]} />
     </>
   );
+  const dots = opt.dots ?? points.length <= 24;
   return (
     <div>
       <ResponsiveContainer width="100%" height={height}>
         {spec.type === "line" ? (
           <LineChart {...common}>
             {axes}
-            <Line dataKey="value" stroke={PALETTE[0]} strokeWidth={2} dot={points.length <= 24 ? { r: 2.5 } : false} connectNulls={false} isAnimationActive={anim} />
+            <Line dataKey="value" stroke={PALETTE[0]} strokeWidth={2} dot={dots ? { r: 3, fill: PALETTE[0] } : false} activeDot={{ r: 5 }} connectNulls={false} isAnimationActive={anim}>
+              {opt.labels && <LabelList dataKey="value" position="top" fontSize={10} formatter={labelFmt} />}
+            </Line>
           </LineChart>
         ) : spec.type === "area" ? (
           <AreaChart {...common}>
             {axes}
-            <Area dataKey="value" stroke={PALETTE[0]} fill={PALETTE[0]} fillOpacity={0.12} strokeWidth={2} isAnimationActive={anim} />
+            <Area dataKey="value" stroke={PALETTE[0]} fill={PALETTE[0]} fillOpacity={0.12} strokeWidth={2} dot={opt.dots ? { r: 3, fill: PALETTE[0] } : false} isAnimationActive={anim}>
+              {opt.labels && <LabelList dataKey="value" position="top" fontSize={10} formatter={labelFmt} />}
+            </Area>
           </AreaChart>
         ) : (
           <BarChart {...common} barCategoryGap={spec.type === "histogram" ? 1 : "20%"}>
             {axes}
-            <Bar dataKey="value" fill={PALETTE[0]} radius={spec.type === "histogram" ? 0 : [4, 4, 0, 0]} maxBarSize={48} isAnimationActive={anim} />
+            <Bar dataKey="value" fill={PALETTE[0]} radius={spec.type === "histogram" ? 0 : [4, 4, 0, 0]} maxBarSize={48} isAnimationActive={anim}>
+              {opt.labels && <LabelList dataKey="value" position="top" fontSize={10} formatter={labelFmt} />}
+            </Bar>
           </BarChart>
         )}
       </ResponsiveContainer>
       {note}
     </div>
+  );
+}
+
+/** Treemap tile with name and share, only when the tile is large enough to read. */
+function TreemapCell(props: { x?: number; y?: number; width?: number; height?: number; name?: string; size?: number; fill?: string; total: number; depth?: number }) {
+  const { x = 0, y = 0, width = 0, height = 0, name, size = 0, fill, total, depth } = props;
+  if (depth === 0) return null;
+  const big = width > 70 && height > 34;
+  return (
+    <g>
+      <rect x={x} y={y} width={width} height={height} fill={fill ?? PALETTE[0]} stroke="#fff" strokeWidth={2} rx={4} />
+      {big && (
+        <>
+          <text x={x + 8} y={y + 18} fontSize={12} fill="#fff" fontWeight={600}>
+            {short(String(name ?? ""), Math.max(4, Math.floor(width / 8)))}
+          </text>
+          <text x={x + 8} y={y + 33} fontSize={11} fill="#fff" opacity={0.9}>
+            {((size / total) * 100).toFixed(1)}%
+          </text>
+        </>
+      )}
+    </g>
   );
 }

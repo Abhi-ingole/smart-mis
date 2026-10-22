@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Download, FileText, Lightbulb, Plus, RotateCcw, ShieldCheck } from "lucide-react";
+import { Download, FileDown, FileText, Lightbulb, Plus, RotateCcw, ShieldCheck } from "lucide-react";
+import { toJpeg } from "html-to-image";
 import { DatasetGate, DatasetSwitcher, type Loaded } from "../components/DatasetGate";
 import { ChartCard, ChartEditor, KpiCard, KpiEditor } from "../components/DashboardParts";
 import { FilterBar } from "../components/FilterBar";
@@ -8,7 +9,7 @@ import { Alert, Fingerprint, PageHeader, QualityRing, useToast } from "../compon
 import { describeFilters, EMPTY_FILTERS, useView } from "../state/view";
 import { recommendKpis } from "../engine/kpi";
 import { recommendCharts } from "../engine/charts";
-import { download, reportWorkbook, tableCsv } from "../export/exporters";
+import { download, reportPdf, reportWorkbook, tableCsv } from "../export/exporters";
 import { buildReport } from "../engine/report";
 import type { Filters } from "../engine/types";
 
@@ -35,6 +36,33 @@ function Dashboard({ record, analysis, update }: Loaded) {
     await save({ kpis: recommendKpis(record.schema, profiles, domain, table), charts: recommendCharts(record.schema, profiles, domain, table) });
     toast("success", "Dashboard rebuilt from the current columns and types.");
   };
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const [capturing, setCapturing] = useState(false);
+  /** PDF of exactly what is on screen: KPIs, every chart in its chosen type, insights, quality. */
+  const exportPdf = async () => {
+    setPdfBusy(true);
+    setCapturing(true); // re-render charts without animation so the captured picture is complete
+    await new Promise((r) => setTimeout(r, 1600));
+    try {
+      const images: { title: string; png: string; width: number; height: number }[] = [];
+      for (const c of dash.charts) {
+        if (c.type === "table" && !c.x) continue; // raw rows go to the appendix instead
+        const node = document.querySelector<HTMLElement>(`[data-chart-capture="${CSS.escape(c.id)}"]`);
+        if (!node) continue;
+        const png = await toJpeg(node, { pixelRatio: 1.6, quality: 0.88, backgroundColor: "#ffffff", cacheBust: true });
+        images.push({ title: c.title, png, width: node.offsetWidth, height: node.offsetHeight });
+      }
+      const model = buildReport({ meta: record, title: `${record.name} — Dashboard`, table, rows, profiles, quality, dashboard: dash, kpiValues, insights, filtersNote: describeFilters(filters, record), appendixRows: 50 });
+      const blob = await reportPdf(model, images, new Set(["summary", "kpis", "trends", "categories", "exceptions", "quality", "insights", "recommendations", "appendix"]));
+      download(`${record.name.replace(/[^\w\- ]+/g, " ").replace(/\s+/g, " ").trim() || "dashboard"} - dashboard.pdf`, blob, "application/pdf");
+      toast("success", `PDF downloaded with ${images.length} chart${images.length === 1 ? "" : "s"}.`);
+    } catch (e) {
+      toast("error", `Couldn't create the PDF: ${(e as Error).message}`);
+    } finally {
+      setCapturing(false);
+      setPdfBusy(false);
+    }
+  };
   const exportExcel = () => {
     const model = buildReport({ meta: record, table, rows, profiles, quality, dashboard: dash, kpiValues, insights, filtersNote: describeFilters(filters, record) });
     download(`${record.name}.xlsx`, reportWorkbook(model, table, rows), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -60,6 +88,9 @@ function Dashboard({ record, analysis, update }: Loaded) {
             </Link>
             <button className="btn-secondary" onClick={() => download(`${record.name}.csv`, tableCsv(table, rows), "text/csv;charset=utf-8")}>
               <Download className="h-4 w-4" /> CSV
+            </button>
+            <button className="btn-secondary" onClick={exportPdf} disabled={pdfBusy}>
+              <FileDown className="h-4 w-4" /> {pdfBusy ? "Preparing…" : "PDF"}
             </button>
             <button className="btn-secondary" onClick={exportExcel}>
               <Download className="h-4 w-4" /> Excel
@@ -131,7 +162,8 @@ function Dashboard({ record, analysis, update }: Loaded) {
                 spec={c}
                 table={table}
                 rows={rows}
-                wide={c.type === "table" || c.type === "heatmap"}
+                wide={(c.type === "table" && !c.x) || c.type === "heatmap" || (c.measures?.length ?? 0) > 2}
+                animate={!capturing}
                 onChange={(s) => save({ charts: dash.charts.map((x) => (x.id === c.id ? s : x)) })}
                 onRemove={() => save({ charts: dash.charts.filter((x) => x.id !== c.id) })}
               />

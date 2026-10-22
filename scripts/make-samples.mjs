@@ -127,3 +127,18 @@ const csv = (aoa) => aoa.map((r) => r.map((v) => (v === null || v === undefined 
   for (let i = 0; i < 12; i++) base.push([...base[int(0, base.length - 1)]]); // exact duplicates
   write("messy-expenses.csv", csv([...rows, ...base]));
 }
+
+// ── F. Company financials (wide format: one row per year, several money measures) ──
+{
+  const rows = [["Financial Year", "Revenue (₹)", "EBITDA (₹)", "EBIT (₹)", "Net Profit / PAT (₹)", "Employees"]];
+  const years = ["FY 2019-20", "FY 2020-21", "FY 2021-22", "FY 2022-23", "FY 2023-24", "FY 2024-25"];
+  let rev = 42000000;
+  for (const y of years) {
+    rev = Math.round(rev * (1.08 + rand() * 0.25));
+    const ebitda = Math.round(rev * (0.12 + rand() * 0.08));
+    const ebit = Math.round(ebitda * (0.78 + rand() * 0.1));
+    const pat = Math.round(ebit * (0.62 + rand() * 0.1));
+    rows.push([y, rev, ebitda, ebit, pat, int(40, 180)]);
+  }
+  writeXlsx("company-financials.xlsx", [["P&L Summary", rows]]);
+}

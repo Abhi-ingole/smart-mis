@@ -174,3 +174,59 @@ describe("dashboard recomputes consistently", () => {
     expect(q.score).toBeGreaterThan(0);
   });
 });
+
+describe("visualisations", () => {
+  it("compares several measures side by side and offers a table view", async () => {
+    const { buildChartData, chartDataTable, compatibleTypes } = await import("../src/engine/charts");
+    const rec = await loadSample("sales-orders.xlsx", "Orders");
+    const ev = evaluate(rec);
+    const k = (n: string) => rec.schema.find((c) => c.name === n)!.key;
+    const spec = { id: "m", type: "column" as const, title: "t", x: k("Region"), measures: [k("Revenue (₹)"), k("Quantity")], agg: "sum" as const, reason: "" };
+    const d = buildChartData(spec, ev.table, ev.rows);
+    expect(d.kind).toBe("multi");
+    if (d.kind !== "multi") return;
+    expect(d.series.map((s) => s.name)).toEqual(["Revenue (₹)", "Quantity"]);
+    const west = ev.rows.filter((i) => ev.table.str[k("Region")][i] === "West");
+    const westQty = west.reduce((a, i) => a + (ev.table.num[k("Quantity")][i] ?? 0), 0);
+    expect(d.series[1].values[d.labels.indexOf("West")]).toBe(westQty);
+    const t = chartDataTable(d)!;
+    expect(t.headers).toEqual(["Region", "Revenue (₹)", "Quantity"]);
+    expect(compatibleTypes(spec, rec.schema)).toContain("stacked");
+    // Averages are never offered as shares
+    const avg = { ...spec, measures: undefined, y: k("Unit Price (₹)"), agg: "avg" as const };
+    expect(compatibleTypes(avg, rec.schema)).not.toContain("pie");
+    expect(compatibleTypes({ ...avg, agg: "sum" }, rec.schema)).toEqual(expect.arrayContaining(["pie", "donut", "treemap"]));
+  });
+
+  it("sorts and limits categories as chosen", async () => {
+    const { buildChartData } = await import("../src/engine/charts");
+    const rec = await loadSample("sales-orders.xlsx", "Orders");
+    const ev = evaluate(rec);
+    const k = (n: string) => rec.schema.find((c) => c.name === n)!.key;
+    const d = buildChartData({ id: "s", type: "column", title: "t", x: k("Product"), y: k("Revenue (₹)"), agg: "sum", reason: "", options: { sort: "label", top: 5 } }, ev.table, ev.rows);
+    if (d.kind !== "series") throw new Error(d.kind);
+    expect(d.points.length).toBe(6); // 5 + "Other"
+    expect(d.points.at(-1)!.label).toMatch(/^Other/);
+    const shown = d.points.slice(0, 5).map((p) => p.label);
+    expect([...shown].sort()).toEqual(shown); // A → Z
+    const byValue = buildChartData({ id: "v", type: "column", title: "t", x: k("Product"), y: k("Revenue (₹)"), agg: "sum", reason: "", options: { top: 5 } }, ev.table, ev.rows);
+    if (byValue.kind !== "series") throw new Error();
+    expect(new Set(shown)).toEqual(new Set(byValue.points.slice(0, 5).map((p) => p.label))); // same 5 largest
+  });
+});
+
+describe("financial statements (wide format)", () => {
+  it("recommends a side-by-side comparison of EBITDA, EBIT and PAT by year", async () => {
+    const rec = await loadSample("company-financials.xlsx");
+    const multi = rec.dashboard.charts.find((c) => (c.measures?.length ?? 0) >= 3);
+    expect(multi).toBeTruthy();
+    const names = multi!.measures!.map((k) => rec.schema.find((c) => c.key === k)!.name);
+    expect(names).toEqual(expect.arrayContaining(["EBITDA (₹)", "EBIT (₹)", "Net Profit / PAT (₹)"]));
+    expect(rec.schema.find((c) => c.key === multi!.x)!.name).toBe("Financial Year");
+    const { buildChartData } = await import("../src/engine/charts");
+    const ev = evaluate(rec);
+    const d = buildChartData(multi!, ev.table, ev.rows);
+    if (d.kind !== "multi") throw new Error(d.kind);
+    expect(d.labels).toEqual(["FY 2019-20", "FY 2020-21", "FY 2021-22", "FY 2022-23", "FY 2023-24", "FY 2024-25"]); // chronological
+  });
+});

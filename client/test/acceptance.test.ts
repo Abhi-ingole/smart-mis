@@ -34,7 +34,11 @@ describe("Test A — sales workbook", () => {
     // Trend + category charts are recommended
     const types = rec.dashboard.charts.map((c) => c.type);
     expect(types).toContain("line");
-    expect(types).toContain("bar");
+    expect(types.some((t) => t === "column" || t === "bar")).toBe(true);
+    expect(types).toContain("treemap"); // many products/customers
+    // KPI sparkline: one value per month
+    expect(rev.trend?.length).toBe(12);
+    expect(rev.trend!.reduce((a, p) => a + (p.value ?? 0), 0)).toBe(expectedRevenue);
     const date = rec.schema.find((c) => c.name === "Order Date")!;
     expect(date.type).toBe("date");
     // Excel dates stay calendar dates whatever the computer's time zone is

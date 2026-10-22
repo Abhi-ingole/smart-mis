@@ -171,8 +171,37 @@ export function periodComparison(table: Table, rows: number[], timeKey: string |
   return { last, prev, label: `${bucketLabel(lastStart, bucket)} vs ${bucketLabel(prevStart, bucket)}${note}` };
 }
 
+/** Rows split into time periods (last `max` periods), for KPI sparklines. */
+export function periodBuckets(table: Table, rows: number[], timeKey: string | undefined, max = 12): { label: string; rows: number[] }[] {
+  if (!timeKey || !table.num[timeKey]) return [];
+  const t = table.num[timeKey];
+  let min = Infinity;
+  let maxDay = -Infinity;
+  for (const i of rows) {
+    const d = t[i];
+    if (d === null) continue;
+    if (d < min) min = d;
+    if (d > maxDay) maxDay = d;
+  }
+  if (!Number.isFinite(min)) return [];
+  const bucket = chooseBucket(min, maxDay);
+  const map = new Map<number, number[]>();
+  for (const i of rows) {
+    const d = t[i];
+    if (d === null) continue;
+    const s = bucketStart(d, bucket);
+    let arr = map.get(s);
+    if (!arr) map.set(s, (arr = []));
+    arr.push(i);
+  }
+  const out: { label: string; rows: number[] }[] = [];
+  for (let s = bucketStart(min, bucket), g = 0; s <= maxDay && g < 5000; s = nextBucket(s, bucket), g++) out.push({ label: bucketLabel(s, bucket), rows: map.get(s) ?? [] });
+  return out.slice(-max);
+}
+
 export function evaluateKpis(defs: KpiDef[], table: Table, rows: number[], ctx: KpiContext = {}, timeKey?: string): KpiValue[] {
   const cmp = periodComparison(table, rows, timeKey);
+  const buckets = periodBuckets(table, rows, timeKey);
   return defs.map((def) => {
     const { value, label } = computeKpi(def, table, rows, ctx);
     const out: KpiValue = { id: def.id, value, display: formatKpi(def, value, table.schema, label), formula: formulaOf(def, table.schema), sourceColumns: sourceColumns(def, table.schema) };
@@ -183,6 +212,9 @@ export function evaluateKpis(defs: KpiDef[], table: Table, rows: number[], ctx: 
         const changePct = b !== 0 ? ((a - b) / Math.abs(b)) * 100 : null;
         out.comparison = { label: cmp.label, previous: b, changePct, direction: a > b ? "up" : a < b ? "down" : "flat" };
       }
+    }
+    if (buckets.length >= 3 && COMPARABLE.has(def.agg) && def.agg !== "quality") {
+      out.trend = buckets.map((b) => ({ label: b.label, value: b.rows.length ? computeKpi(def, table, b.rows, ctx).value : def.agg === "count" || def.agg === "sum" ? 0 : null }));
     }
     return out;
   });

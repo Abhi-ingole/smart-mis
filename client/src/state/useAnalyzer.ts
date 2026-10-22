@@ -57,6 +57,7 @@ export function useAnalyzer() {
 export const DEMO_FILES = [
   { file: "sales-orders.xlsx", title: "Sales orders", sheets: ["Orders"], blurb: "640 orders across regions, products and payment modes (Excel)." },
   { file: "hr-employees.xlsx", title: "HR employees", sheets: ["Employees"], blurb: "230 employees with departments, salaries and status (Excel)." },
+  { file: "company-financials.xlsx", title: "Company financials", sheets: ["P&L Summary"], blurb: "Revenue, EBITDA, EBIT and PAT by financial year (Excel)." },
   { file: "student-marks.csv", title: "Student marks", sheets: [] as string[], blurb: "60 students × 5 subjects with results (CSV)." },
   { file: "messy-expenses.csv", title: "Messy expense register", sheets: [] as string[], blurb: "Missing values, duplicates and bad dates — try Data Quality (CSV)." },
   { file: "custom-measurements.csv", title: "Unknown custom data", sheets: [] as string[], blurb: "Columns with no business meaning — generic analysis (CSV)." },

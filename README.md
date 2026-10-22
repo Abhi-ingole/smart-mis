@@ -47,11 +47,19 @@ On Windows use the same commands in Command Prompt or PowerShell. To create `.en
 | **Overview** | Hero with *Upload your data* / *Explore demo*; recent datasets with quality score and a colour "type fingerprint" |
 | **Upload Data** | Drag-and-drop or choose several files; pick worksheets; real progress through each analysis stage (runs in a Web Worker) |
 | **My Datasets** | Search, rename, preview original rows, delete, and **combine two datasets** with a guided join (key selection, match rate, warnings, preview) |
-| **Auto Dashboards** | KPI cards (formula + comparison with the previous period when dates exist), recommended charts, filters, add/remove/rename KPIs, customise or add charts, rebuild |
+| **Auto Dashboards** | KPI cards with formula, comparison with the previous period and a mini trend line; recommended charts; filters; add/remove/rename KPIs; add charts; one-click **PDF** of the whole dashboard |
 | **Report Builder** | 11-section MIS report preview; choose sections; export PDF / Excel / CSV; print-friendly layout |
 | **AI Insights** | Deterministic observations with evidence, separate recommendations, optional AI narrative |
 | **Data Quality** | Score and issues, duplicate inspector, **column mapping** (rename, type, role, meaning, exclude), questions for ambiguous columns, cleaning steps with preview and undo |
 | **Settings** | Local storage usage, delete all data, AI consent, limits |
+
+### Chart toolbar
+
+Every chart has: **⇄ change type** (Column, Bar, Line, Area, Stacked, Pie, Donut, Treemap, Heatmap, Table — only the types that make sense for that data are offered), **▦ table view** of the chart's numbers, **↓ download** (PNG picture or CSV numbers), **⤢ expand**, and **⋯ options**: show values on the chart, show dots on lines, sort (largest / smallest / A→Z), Top 5/10/20/50, customise columns and title, remove.
+
+Visualisations include grouped comparisons of several measures (e.g. EBITDA, EBIT and PAT by financial year), trends, category bars, shares (pie/donut/treemap), stacked bars, heatmaps, histograms, scatter plots and KPI sparklines. Year-like categories (FY 2023-24, Q1…) are kept in time order.
+
+![Chart type switcher](docs/screenshots/chart-switcher.png)
 
 ### How the analysis works
 
@@ -86,11 +94,12 @@ In [`samples/`](samples/) — also used by **Explore demo** and the tests:
 | `hr-employees.xlsx` | B — headcount, salary, attrition |
 | `student-marks.csv` | C — averages, highest/lowest, pass rate from the Result column |
 | `custom-measurements.csv` | D — no business meaning → generic analysis |
+| `company-financials.xlsx` | Revenue, EBITDA, EBIT, PAT by financial year → side-by-side comparison chart |
 | `messy-expenses.csv` | E — title row, duplicate headers, missing values, duplicates, invalid dates, spaces, a formula-looking cell |
 
 ## Tests
 
-`npm test` runs 27 client tests and 8 server tests, including the acceptance tests from the brief:
+`npm test` runs 30 client tests and 8 server tests, including the acceptance tests from the brief:
 
 - **A–D** upload sales / HR / marks / unknown files → correct domain, KPI values checked against independent calculations, formulas, charts; no invented semantics for unknown data
 - **E** missing values and duplicates → quality warnings and lower score

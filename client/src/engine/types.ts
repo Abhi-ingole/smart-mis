@@ -168,9 +168,12 @@ export interface KpiValue {
   formula: string;
   sourceColumns: string[];
   comparison?: { label: string; previous: number; changePct: number | null; direction: "up" | "down" | "flat" };
+  /** Value per period (oldest → newest), for the sparkline. */
+  trend?: { label: string; value: number | null }[];
 }
 
-export type ChartType = "bar" | "line" | "area" | "pie" | "donut" | "scatter" | "histogram" | "stacked" | "heatmap" | "table";
+/** "column" = vertical bars, "bar" = horizontal bars. */
+export type ChartType = "column" | "bar" | "line" | "area" | "pie" | "donut" | "treemap" | "scatter" | "histogram" | "stacked" | "heatmap" | "table";
 export type TimeBucket = "day" | "week" | "month" | "quarter" | "year";
 
 export interface ChartSpec {
@@ -184,9 +187,25 @@ export interface ChartSpec {
   agg: "sum" | "avg" | "count" | "min" | "max" | "median";
   /** Second dimension for stacked bars and heatmaps. */
   series?: string;
+  /** Several measures compared side by side (grouped columns / multi-line). Overrides `y`. */
+  measures?: string[];
   bucket?: TimeBucket;
   limit?: number;
   reason: string;
+  options?: ChartOptions;
+}
+
+export interface ChartOptions {
+  /** Show the chart's numbers as a table instead of a picture. */
+  asTable?: boolean;
+  /** Value labels on bars / points. */
+  labels?: boolean;
+  /** Point markers on line and area charts. */
+  dots?: boolean;
+  /** Category order. */
+  sort?: "value-desc" | "value-asc" | "label";
+  /** How many categories to show (rest grouped as "Other" when additive). */
+  top?: number;
 }
 
 export interface Filters {

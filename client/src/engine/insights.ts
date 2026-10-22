@@ -158,11 +158,12 @@ export function generateInsights(table: Table, rows: number[], profiles: Record<
 
   // 4. Strong relationships between measures (correlation, not causation)
   const ms = measures.slice(0, 6);
+  let correlations = 0;
   for (let i = 0; i < ms.length; i++)
     for (let j = i + 1; j < ms.length; j++) {
       const { x, y } = pairs(table, rows, ms[i].key, ms[j].key);
       const r = pearson(x, y);
-      if (r !== null && Math.abs(r) >= 0.7 && Math.abs(r) < 0.999) {
+      if (r !== null && Math.abs(r) >= 0.7 && Math.abs(r) < 0.999 && correlations++ < 2) {
         push({ kind: "correlation", text: `${ms[i].name} and ${ms[j].name} move ${r > 0 ? "together" : "in opposite directions"} (correlation ${r.toFixed(2)}). This shows association, not cause.`, evidence: [{ label: "Correlation", value: r.toFixed(2) }, { label: "Rows compared", value: fmtNumber(x.length) }], importance: 5 });
       }
     }

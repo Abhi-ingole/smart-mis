@@ -113,6 +113,12 @@ export function pdfText(s: string): string {
     .replace(/₹/g, "Rs")
     .replace(/≥/g, ">=")
     .replace(/≤/g, "<=")
+    .replace(/[−‒]/g, "-")
+    .replace(/→/g, "->")
+    .replace(/←/g, "<-")
+    .replace(/[↑▲]/g, "^")
+    .replace(/[↓▼]/g, "v")
+    .replace(/≈/g, "~")
     .replace(/[^\x00-\xff]/g, (ch) => (WINANSI_EXTRA.has(ch) ? ch : "?"));
 }
 
@@ -195,15 +201,45 @@ export async function reportPdf(model: ReportModel, chartImages: { title: string
   }
   if (include.has("trends") && chartImages.length) {
     heading("Trends and visual analysis");
+    // Charts at their on-screen size (1 px ≈ 0.75 pt); small charts sit two per row.
+    const full = W - 2 * M;
+    const gap = 16;
+    let col = 0;
+    let rowH = 0;
     for (const img of chartImages) {
-      const w = W - 2 * M;
-      const h = Math.min(260, (img.height / img.width) * w);
-      ensure(h + 24);
-      doc.setFont("helvetica", "bold").setFontSize(10).setTextColor(...ink).text(pdfText(img.title), M, y);
-      y += 8;
-      doc.addImage(img.png, img.png.startsWith("data:image/jpeg") ? "JPEG" : "PNG", M, y, w, h, undefined, "FAST");
-      y += h + 16;
+      let w = Math.min(full, img.width * 0.75);
+      let h = (img.height / img.width) * w;
+      if (h > 300) {
+        w = (w * 300) / h;
+        h = 300;
+      }
+      const half = (full - gap) / 2;
+      const twoUp = w <= half + 1;
+      if (twoUp) {
+        w = Math.min(w, half);
+        h = (img.height / img.width) * w;
+      }
+      if (!twoUp || col === 0) {
+        if (col === 1) {
+          y += rowH + 16;
+          col = 0;
+          rowH = 0;
+        }
+        ensure(h + 24);
+      }
+      const x = twoUp && col === 1 ? M + half + gap : M;
+      doc.setFont("helvetica", "bold").setFontSize(9).setTextColor(...ink).text(pdfText(img.title).slice(0, twoUp ? 60 : 120), x, y);
+      doc.addImage(img.png, img.png.startsWith("data:image/jpeg") ? "JPEG" : "PNG", x, y + 6, w, h, undefined, "FAST");
+      if (twoUp && col === 0) {
+        col = 1;
+        rowH = h + 6;
+      } else {
+        y += Math.max(rowH, h + 6) + 16;
+        col = 0;
+        rowH = 0;
+      }
     }
+    if (col === 1) y += rowH + 16;
   }
   if (include.has("categories") && model.categories.length) {
     heading("Category analysis");
