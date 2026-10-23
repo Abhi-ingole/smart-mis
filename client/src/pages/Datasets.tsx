@@ -31,7 +31,7 @@ export default function DatasetsPage() {
           </Link>
         }
       >
-        Each uploaded sheet is saved here, in this browser only.
+        Each uploaded sheet appears here while this tab is open. Nothing is saved.
       </EmptyState>
     );
 

@@ -11,7 +11,7 @@ const HINT = {
   moneyWeak: /(total|value|rate|charges?|balance|price)/i,
   pct: /(%|percent|pct|ratio|share|margin|growth|attendance|completion|conversion)/i,
   date: /(date|time|day|month|year|period|dob|joined|joining|created|updated|timestamp|week|when)/i,
-  id: /(\bid\b|_id\b|\bid$|^id|code$|\bno\.?$|number$|^#|\bkey$|sku|roll\s*no|emp\s*id|ref(erence)?\b|invoice\s*no|order\s*no|uuid)/i,
+  id: /(^s[rl]\.?\s*(no\.?)?$|^s\.?\s*no\.?$|serial|\bid\b|_id\b|\bid$|^id|code$|\bno\.?$|number$|^#|\bkey$|sku|roll\s*no|emp\s*id|ref(erence)?\b|invoice\s*no|order\s*no|uuid)/i,
   year: /^(year|yr|fy|fiscal\s*year)$/i,
 };
 

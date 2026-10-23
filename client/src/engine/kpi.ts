@@ -326,7 +326,10 @@ export function recommendKpis(schema: ColumnSchema[], profiles: Record<string, C
     const agg = defaultAgg(m);
     add({ name: `${agg === "sum" ? "Total" : "Average"} ${m.name}`, agg, columnKey: m.key, format: fmtFor(m) === "number" && agg === "avg" ? "decimal" : fmtFor(m), description: `${agg === "sum" ? "Sum" : "Mean"} of ${m.name}.` }, `m-${m.key}`);
   }
-  if (domain.domain === "generic" && ids[0]) add({ name: `Distinct ${ids[0].name}`, agg: "countDistinct", columnKey: ids[0].key, format: "number", description: `Number of different ${ids[0].name} values.` }, "ids");
+  // Row numbers (Sr., S.No, 1..n) always equal the row count, so count a real ID instead.
+  const rowNumber = (c: (typeof ids)[number]) => /^(s[rl]\.?\s*(no\.?)?|s\.?\s*no\.?|serial(\s*no\.?)?|#|row)$/i.test(c.name.trim()) || c.notes.some((n) => n.startsWith("Consecutive"));
+  const mainId = ids.find((c) => !rowNumber(c));
+  if (domain.domain === "generic" && mainId) add({ name: `Distinct ${mainId.name}`, agg: "countDistinct", columnKey: mainId.key, format: "number", description: `Number of different ${mainId.name} values.` }, "ids");
 
   const mainDim = [...dims].sort((a, b) => dimScore(b) - dimScore(a))[0];
   function dimScore(c: ColumnSchema) {

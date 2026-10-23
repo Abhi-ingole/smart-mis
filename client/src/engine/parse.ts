@@ -88,7 +88,7 @@ export function buildSheet(name: string, matrix: Cell[][]): RawSheet {
   const numericShare = nonBlank.filter(looksNumeric).length / Math.max(1, nonBlank.length);
   const hasHeader = nonBlank.length > 0 && numericShare < 0.5;
 
-  let colCount = Math.max(...rows.map((r) => r.length));
+  let colCount = rows.reduce((m, r) => Math.max(m, r.length), 0); // no spread: sheets can have 100k+ rows
   // Trim columns that are empty everywhere (common in Excel exports).
   while (colCount > 0 && rows.every((r) => isBlank(r[colCount - 1] ?? null))) colCount--;
   if (colCount > LIMITS.maxCols) throw new ParseError(`Sheet "${name}" has ${colCount} columns. The limit is ${LIMITS.maxCols}.`);
@@ -201,7 +201,7 @@ export function parseJsonText(text: string, name = "Data"): RawSheet {
   return buildSheet(name, [headers, ...records.map((r) => headers.map((h) => cellToValue(r[h])))]);
 }
 
-export async function parseFile(file: { name: string; size: number; arrayBuffer: () => Promise<ArrayBuffer> }): Promise<ParsedFile> {
+export async function parseFile(file: { name: string; size: number; arrayBuffer: () => Promise<ArrayBuffer> }, onStatus?: (text: string) => void): Promise<ParsedFile> {
   const buf = await file.arrayBuffer();
   const head = new Uint8Array(buf.slice(0, 8192));
   const kind = detectKind(file.name, file.size, head);
@@ -214,7 +214,7 @@ export async function parseFile(file: { name: string; size: number; arrayBuffer:
     sheets = [parseJsonText(new TextDecoder("utf-8").decode(buf), base)];
   } else if (kind === "pdf") {
     const { parsePdf } = await import("./pdf");
-    sheets = await parsePdf(buf, file.name);
+    sheets = await parsePdf(buf, file.name, (p, n) => onStatus?.(`reading PDF page ${p.toLocaleString("en-IN")} of ${n.toLocaleString("en-IN")}…`));
   } else {
     sheets = parseWorkbook(buf);
   }

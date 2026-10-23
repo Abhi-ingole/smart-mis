@@ -13,6 +13,7 @@ export type WorkerRequest =
 
 export type WorkerResponse =
   | { type: "progress"; progress: AnalysisProgress; sheet?: string }
+  | { type: "status"; text: string }
   | { type: "inspected"; fileName: string; sheets: { name: string; rows: number; cols: number; warnings: string[] }[] }
   | { type: "done"; datasets: DatasetRecord[]; skipped: { sheet: string; reason: string }[] }
   | { type: "error"; message: string };
@@ -29,7 +30,7 @@ self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
     post({ type: "progress", progress: { stage: "read", label: STAGES[0].label, done: 0, total: STAGES.length, detail: msg.file.name } });
     let parsed = cache && cache.key === keyOf(msg.file) ? cache : null;
     if (!parsed) {
-      const p = await parseFile(msg.file);
+      const p = await parseFile(msg.file, (text) => post({ type: "status", text }));
       parsed = { key: keyOf(msg.file), sheets: p.sheets, kind: p.kind };
       cache = parsed;
     }

@@ -18,7 +18,7 @@ function getWorker() {
   return worker;
 }
 
-function run<T extends WorkerResponse>(req: WorkerRequest, onProgress?: (p: AnalysisProgress, sheet?: string) => void): Promise<T> {
+function run<T extends WorkerResponse>(req: WorkerRequest, onProgress?: (p: AnalysisProgress, sheet?: string) => void, onStatus?: (text: string) => void): Promise<T> {
   const job = queue.then(
     () =>
       new Promise<T>((resolve, reject) => {
@@ -29,8 +29,13 @@ function run<T extends WorkerResponse>(req: WorkerRequest, onProgress?: (p: Anal
             onProgress?.(m.progress, m.sheet);
             return;
           }
-          if (m.type === "error") reject(new Error(m.message));
-          else resolve(m as T);
+          if (m.type === "status") {
+            onStatus?.(m.text);
+            return;
+          }
+          if (m?.type === "error") reject(new Error(m.message));
+          else if (m?.type === "inspected" || m?.type === "done") resolve(m as T);
+          // Anything else (e.g. a message from a library) is ignored.
         };
         w.onerror = (e) => {
           w.terminate();
@@ -44,8 +49,9 @@ function run<T extends WorkerResponse>(req: WorkerRequest, onProgress?: (p: Anal
   return job;
 }
 
-export async function inspectFile(file: File): Promise<SheetInfo[]> {
-  const r = await run<Extract<WorkerResponse, { type: "inspected" }>>({ type: "inspect", file });
+export async function inspectFile(file: File, onStatus?: (text: string) => void): Promise<SheetInfo[]> {
+  const r = await run<Extract<WorkerResponse, { type: "inspected" }>>({ type: "inspect", file }, undefined, onStatus);
+  if (r.type !== "inspected" || !Array.isArray(r.sheets)) throw new Error(`Couldn't read "${file.name}". Please try again.`);
   return r.sheets;
 }
 

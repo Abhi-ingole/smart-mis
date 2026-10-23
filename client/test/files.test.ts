@@ -30,6 +30,40 @@ describe("PDF tables", () => {
     expect(["number", "currency"]).toContain(sent.type);
   });
 
+  it("splits header labels that sit in one text run and treats 'Sr.' as a row number", async () => {
+    const doc = new jsPDF();
+    doc.setFont("courier", "normal");
+    doc.setFontSize(9);
+    const xCode = 110;
+    const xBatch = xCode + doc.getTextWidth("process_code ");
+    for (let page = 0; page < 2; page++) {
+      if (page) doc.addPage();
+      doc.text("Campaign Report", 80, 10);
+      doc.text("Sr.", 10, 20);
+      doc.text("Mobile_Number", 22, 20);
+      doc.text("Upload Time", 60, 20);
+      doc.text("process_code batch_id", xCode, 20); // one run covering two columns
+      doc.text("Status", 165, 20);
+      for (let i = 0; i < 30; i++) {
+        const n = page * 30 + i + 1;
+        const y = 26 + i * 6;
+        doc.text(String(n), 10, y);
+        doc.text(`91980000${String(n).padStart(4, "0")}`, 22, y);
+        doc.text("22-10-2026 11:07", 60, y);
+        doc.text(String(922634000 + n), xCode, y);
+        doc.text(n % 2 ? "bma4gr5fqj" : "erjk4smtl8", xBatch, y);
+        doc.text(n % 7 ? "Submitted" : "Failed", 165, y);
+      }
+    }
+    const parsed = await parseFile(fileFrom("Campaign.pdf", Buffer.from(doc.output("arraybuffer"))));
+    const s = parsed.sheets[0];
+    expect(s.headers).toEqual(["Sr.", "Mobile_Number", "Upload Time", "process_code", "batch_id", "Status"]);
+    expect(s.rows.length).toBe(60);
+    expect(s.rows[59]).toEqual(["60", "919800000060", "22-10-2026 11:07", "922634060", "erjk4smtl8", "Submitted"]);
+    const rec = analyzeSheet(s, parsed);
+    expect(rec.schema.find((c) => c.name === "Sr.")?.role).toBe("identifier");
+  });
+
   it("rejects PDFs without text and fake PDFs", async () => {
     const blank = new jsPDF();
     blank.rect(10, 10, 50, 50);

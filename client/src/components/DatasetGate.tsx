@@ -46,7 +46,7 @@ export function DatasetGate({ base, title, children }: { base: string; title: st
     return (
       <div className="space-y-4">
         <PageHeader title={title} />
-        <Alert kind="warn">This dataset isn't in this browser any more (it may have been deleted). Pick another one:</Alert>
+        <Alert kind="warn">This dataset isn't open any more (data is cleared when the tab is closed or reloaded). Pick another one or upload the file again:</Alert>
         <DatasetPicker base={base} />
       </div>
     );

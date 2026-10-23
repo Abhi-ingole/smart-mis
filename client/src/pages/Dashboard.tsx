@@ -78,7 +78,7 @@ function Dashboard({ record, analysis, update }: Loaded) {
             <span>{record.rowCount.toLocaleString("en-IN")} rows</span>
             <span>{record.schema.filter((c) => !c.excluded).length} columns</span>
             <span>{domain.domain === "generic" ? "General data — descriptive statistics" : `Looks like ${domain.label.toLowerCase()} data (${domain.evidence.slice(0, 3).join(", ")})`}</span>
-            <span className="text-ink-faint">Stored locally</span>
+            <span className="text-ink-faint">Not saved — cleared when you close this tab</span>
           </div>
         }
         actions={

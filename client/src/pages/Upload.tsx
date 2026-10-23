@@ -12,6 +12,7 @@ interface Pending {
   file: File;
   status: "inspecting" | "ready" | "error";
   error?: string;
+  note?: string;
   sheets: SheetInfo[];
   selected: string[];
 }
@@ -45,7 +46,7 @@ export default function UploadPage() {
     setPending((p) => [...p, ...fresh]);
     for (const item of fresh.filter((f) => f.status === "inspecting")) {
       try {
-        const sheets = await inspectFile(item.file);
+        const sheets = await inspectFile(item.file, (note) => setPending((p) => p.map((x) => (x.file === item.file ? { ...x, note } : x))));
         const withData = sheets.filter((s) => s.rows > 0).map((s) => s.name);
         setPending((p) => p.map((x) => (x.file === item.file ? { ...x, status: withData.length ? "ready" : "error", error: withData.length ? undefined : "No sheet in this file has data rows.", sheets, selected: withData } : x)));
       } catch (e) {
@@ -213,7 +214,7 @@ export default function UploadPage() {
                     <p className="truncate font-medium">{p.file.name}</p>
                     <p className="text-xs text-ink-soft">
                       {fmtSize(p.file.size)}
-                      {p.status === "inspecting" && " · reading sheets…"}
+                      {p.status === "inspecting" && ` · ${p.note ?? "reading sheets…"}`}
                       {p.status === "ready" && ` · ${p.sheets.length} sheet${p.sheets.length > 1 ? "s" : ""}`}
                     </p>
                     {p.status === "error" && <p className="mt-1 text-sm text-bad">{p.error}</p>}
