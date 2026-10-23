@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ArrowDownRight, ArrowUpRight, Info, Minus, Pencil, Trash2 } from "lucide-react";
 import type { Agg, ColumnSchema, KpiDef, KpiValue } from "../engine/types";
 import { isNumericType } from "../engine/table";
-import { fmtPercent } from "../engine/format";
+import { fmtNumber, fmtPercent } from "../engine/format";
 import { Field, Modal } from "./ui";
 
 export { ChartCard, ChartEditor } from "./ChartCard";
@@ -24,11 +24,11 @@ function Sparkline({ points }: { points: { label: string; value: number | null }
   });
   const last = points[points.length - 1];
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="mt-2 h-8 w-full" preserveAspectRatio="none" role="img" aria-label={`Trend over ${points.length} periods, ${points[0].label} to ${last.label}`}>
+    <svg viewBox={`0 0 ${w} ${h}`} className="my-2 h-7 w-full" preserveAspectRatio="none" role="img" aria-label={`Trend over ${points.length} periods, ${points[0].label} to ${last.label}`}>
       <title>{points.map((p) => `${p.label}: ${p.value ?? "—"}`).join("\n")}</title>
-      <path d={`${d}L${w},${h}L0,${h}Z`} fill="var(--color-accent)" opacity={0.08} />
-      <path d={d} fill="none" stroke="var(--color-accent)" strokeWidth={1.6} vectorEffect="non-scaling-stroke" />
-      {last.value !== null && <circle cx={w} cy={y(last.value)} r={2.5} fill="var(--color-accent)" />}
+      <path d={`${d}L${w},${h}L0,${h}Z`} fill="var(--color-s1)" opacity={0.07} />
+      <path d={d} fill="none" stroke="var(--color-s1)" strokeWidth={1.4} vectorEffect="non-scaling-stroke" />
+      {last.value !== null && <circle cx={w} cy={y(last.value)} r={2.2} fill="var(--color-s1)" />}
     </svg>
   );
 }
@@ -37,13 +37,14 @@ export function KpiCard({ def, value, onRemove, onRename }: { def: KpiDef; value
   const [info, setInfo] = useState(false);
   const c = value?.comparison;
   const Icon = c?.direction === "up" ? ArrowUpRight : c?.direction === "down" ? ArrowDownRight : Minus;
+  const tone = c?.direction === "up" ? "text-good" : c?.direction === "down" ? "text-bad" : "text-ink-faint";
   return (
-    <div className="card group relative flex flex-col p-4">
+    <div className="card group relative flex flex-col px-4 pb-3 pt-3.5">
       <div className="flex items-start justify-between gap-2">
-        <p className="text-sm text-ink-soft" title={def.name}>
+        <p className="line-clamp-2 text-xs font-medium uppercase tracking-wide text-ink-soft" title={def.name}>
           {def.name}
         </p>
-        <div className="no-print flex shrink-0 gap-0.5 opacity-60 transition-opacity group-hover:opacity-100">
+        <div className="no-print -mr-1 -mt-1 flex shrink-0 gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
           <button className="rounded p-1 text-ink-faint hover:bg-sunken hover:text-ink" aria-label={`How ${def.name} is calculated`} aria-expanded={info} onClick={() => setInfo(!info)}>
             <Info className="h-3.5 w-3.5" />
           </button>
@@ -66,23 +67,36 @@ export function KpiCard({ def, value, onRemove, onRename }: { def: KpiDef; value
           )}
         </div>
       </div>
-      <p className="mt-1.5 break-words text-2xl font-semibold tracking-tight">{value?.display ?? "—"}</p>
-      {c && (
-        <p className={`mt-1 flex items-center gap-1 text-xs font-medium ${c.direction === "up" ? "text-good" : c.direction === "down" ? "text-bad" : "text-ink-faint"}`}>
-          <Icon className="h-3.5 w-3.5" aria-hidden />
-          {c.changePct === null ? (c.direction === "flat" ? "No change" : "Changed from 0") : `${c.direction === "up" ? "Up" : c.direction === "down" ? "Down" : "No change"} ${c.direction === "flat" ? "" : fmtPercent(Math.abs(c.changePct))}`}
-          <span className="font-normal text-ink-faint">· {c.label}</span>
-        </p>
-      )}
+      <p className="mt-2 break-words text-[1.6rem] font-semibold leading-tight tracking-tight text-ink">{value?.display ?? "—"}</p>
       {value?.trend && <Sparkline points={value.trend} />}
+      <div className="mt-auto flex items-center justify-between gap-2 border-t border-line pt-2 text-xs">
+        {c ? (
+          <>
+            <span className="truncate text-ink-faint" title={c.label}>
+              {c.label}
+            </span>
+            <span className={`flex shrink-0 items-center gap-0.5 font-semibold ${tone}`}>
+              <Icon className="h-3.5 w-3.5" aria-hidden />
+              {c.changePct === null ? (c.direction === "flat" ? "0%" : "new") : fmtPercent(Math.abs(c.changePct))}
+            </span>
+          </>
+        ) : (
+          <span className="text-ink-faint">{"\u00a0"}</span>
+        )}
+      </div>
       {info && value && (
-        <div className="mt-3 space-y-1 rounded-lg bg-sunken p-2.5 text-xs text-ink-soft">
+        <div className="mt-2 space-y-1 rounded-md bg-sunken p-2.5 text-xs text-ink-soft">
           <p>
             <span className="font-medium text-ink">Formula:</span> {value.formula}
           </p>
           {value.sourceColumns.length > 0 && (
             <p>
               <span className="font-medium text-ink">Columns:</span> {value.sourceColumns.join(", ")}
+            </p>
+          )}
+          {c && (
+            <p>
+              <span className="font-medium text-ink">Previous:</span> {fmtNumber(c.previous)} ({c.label})
             </p>
           )}
           <p>{def.description}</p>

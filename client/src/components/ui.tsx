@@ -222,3 +222,25 @@ export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: { id: 
     </div>
   );
 }
+
+/** Pill toggle for switching between views of the same data. */
+export function Segmented<T extends string>({ value, onChange, options, size = "md" }: { value: T; onChange: (v: T) => void; options: { value: T; label: ReactNode; disabled?: boolean; title?: string }[]; size?: "sm" | "md" }) {
+  return (
+    <div className="inline-flex rounded-md border border-line bg-sunken p-0.5" role="radiogroup">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          type="button"
+          role="radio"
+          aria-checked={value === o.value}
+          disabled={o.disabled}
+          title={o.title}
+          onClick={() => onChange(o.value)}
+          className={`rounded-[5px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${size === "sm" ? "px-2 py-0.5 text-[11px]" : "px-3 py-1 text-xs"} ${value === o.value ? "bg-side text-white shadow-sm" : "text-ink-soft hover:text-ink"}`}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}

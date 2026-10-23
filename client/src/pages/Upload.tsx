@@ -83,7 +83,7 @@ export default function UploadPage() {
     setPending([]);
     setSkipped([]);
     setResult(r);
-    if (r.datasets.length === 1 && !r.problems.length) navigate(`/dashboard/${r.datasets[0].id}`);
+    if (r.datasets.length === 1 && !r.problems.length) navigate(`/mapping/${r.datasets[0].id}`);
   };
 
   if (busy) return <AnalysisProgress progress={progress} fileLabel={label} />;
@@ -113,13 +113,11 @@ export default function UploadPage() {
                         <Fingerprint types={d.schema.map((c) => c.type)} className="mt-2 max-w-xs" />
                       </div>
                       <div className="flex gap-2">
-                        {questions > 0 && (
-                          <Link className="btn-secondary" to={`/quality/${d.id}?tab=mapping`}>
-                            Confirm columns
-                          </Link>
-                        )}
-                        <Link className="btn-primary" to={`/dashboard/${d.id}`}>
-                          Open dashboard
+                        <Link className="btn-secondary" to={`/dashboard/${d.id}`}>
+                          Skip to dashboard
+                        </Link>
+                        <Link className="btn-primary" to={`/mapping/${d.id}`}>
+                          Review columns
                         </Link>
                       </div>
                     </li>

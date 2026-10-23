@@ -33,9 +33,14 @@ function Quality(d: Loaded) {
         title="Data quality & columns"
         description={`${record.name} — review problems, confirm what each column means, and clean the data. The original upload is always kept.`}
         actions={
-          <Link to={`/dashboard/${record.id}`} className="btn-secondary">
-            Back to dashboard
-          </Link>
+          <>
+            <Link to={`/mapping/${record.id}`} className="btn-secondary">
+              Review columns
+            </Link>
+            <Link to={`/dashboard/${record.id}`} className="btn-secondary">
+              Back to dashboard
+            </Link>
+          </>
         }
       />
       <Tabs<Tab>
@@ -43,7 +48,7 @@ function Quality(d: Loaded) {
         onChange={(t) => setParams({ tab: t })}
         tabs={[
           { id: "overview", label: `Issues (${analysis.quality.issues.length})` },
-          { id: "mapping", label: <>Column mapping{open > 0 && <span className="ml-1.5 rounded bg-warn px-1.5 text-xs text-white">{open}</span>}</> },
+          { id: "mapping", label: <>Column table{open > 0 && <span className="ml-1.5 rounded bg-warn px-1.5 text-xs text-white">{open}</span>}</> },
           { id: "cleaning", label: `Cleaning steps (${record.ops.length})` },
         ]}
       />

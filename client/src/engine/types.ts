@@ -82,6 +82,8 @@ export interface ColumnSchema {
   currencySymbol?: string;
   ambiguity?: Ambiguity;
   notes: string[];
+  /** The user reviewed and accepted this column's type, role and meaning. */
+  confirmed?: boolean;
 }
 
 export interface NumericStats {
@@ -247,6 +249,10 @@ export interface DatasetMeta {
   qualityScore: number;
   warnings: string[];
   storage: "local";
+  /** When the user confirmed the column mapping (absent = still suggestions). */
+  mappingConfirmedAt?: string;
+  /** Last time the rows were re-read from the linked file. */
+  refreshedAt?: string;
 }
 
 export interface DatasetRecord extends DatasetMeta {

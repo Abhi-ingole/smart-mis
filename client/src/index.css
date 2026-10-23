@@ -12,7 +12,7 @@
 @theme {
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
 
-  --color-canvas: #f4f6fb;
+  --color-canvas: #eef1f6;
   --color-surface: #ffffff;
   --color-sunken: #f8f9fc;
   --color-ink: #141a2e;
@@ -26,6 +26,21 @@
   --color-accent-soft: #e8f0ff;
   --color-brand-navy: #04183d;
   --color-brand-cyan: #05c0fc;
+
+  /* report shell */
+  --color-side: #0b1b36;
+  --color-side-soft: #13284a;
+  --color-side-line: #1d3459;
+  --color-side-ink: #c3cde0;
+  --color-side-faint: #7d8cab;
+
+  /* chart series: calm, print-safe, distinguishable */
+  --color-s1: #1d4e89;
+  --color-s2: #2a9d8f;
+  --color-s3: #e9a23b;
+  --color-s4: #6c7a99;
+  --color-s5: #4ea8de;
+  --color-s6: #b5527a;
 
   --color-good: #15865a;
   --color-good-soft: #e7f5ee;
@@ -44,7 +59,7 @@
   --color-t-text: #8a93a6;
   --color-t-identifier: #4a5568;
 
-  --shadow-card: 0 1px 2px rgba(20, 26, 46, 0.05), 0 6px 20px -8px rgba(20, 26, 46, 0.08);
+  --shadow-card: 0 1px 2px rgba(20, 26, 46, 0.06);
   --shadow-pop: 0 12px 40px -12px rgba(20, 26, 46, 0.28);
 }
 
@@ -79,7 +94,7 @@
 
 @layer components {
   .card {
-    @apply rounded-xl border border-line bg-surface;
+    @apply rounded-lg border border-line bg-surface;
     box-shadow: var(--shadow-card);
   }
   .input {
@@ -105,6 +120,12 @@
   }
   .table th {
     @apply sticky top-0 border-b border-line bg-sunken px-3 py-2 text-xs font-semibold text-ink-soft;
+  }
+  .section-title {
+    @apply text-[13px] font-semibold uppercase tracking-wide text-ink-soft;
+  }
+  .panel-title {
+    @apply text-[15px] font-semibold text-ink;
   }
   .table td {
     @apply border-b border-line px-3 py-2 align-top;

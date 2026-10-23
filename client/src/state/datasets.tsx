@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { DatasetMeta, DatasetRecord } from "../engine/types";
 import { analyzeRecord, type Analysis } from "../engine/pipeline";
-import { deleteAllData, deleteDataset, getDataset, listDatasets, saveDataset, updateMeta } from "../storage/db";
+import { deleteAllData, deleteDataset, getDataset, listDatasets, onDatasetChange, saveDataset, updateMeta } from "../storage/db";
 
 interface DatasetsState {
   datasets: DatasetMeta[] | null;
@@ -103,13 +103,16 @@ export function useDataset(id: string | undefined) {
   const [state, setState] = useState<"loading" | "ready" | "missing" | "error">("loading");
   const [error, setError] = useState<string | null>(null);
 
+  const [version, setVersion] = useState(0);
+  useEffect(() => onDatasetChange((changed) => changed === id && setVersion((v) => v + 1)), [id]);
+
   useEffect(() => {
     let alive = true;
     if (!id) {
       setState("missing");
       return;
     }
-    setState("loading");
+    if (version === 0) setState("loading");
     getDataset(id)
       .then((r) => {
         if (!alive) return;
@@ -128,7 +131,7 @@ export function useDataset(id: string | undefined) {
     return () => {
       alive = false;
     };
-  }, [id, setActiveId]);
+  }, [id, setActiveId, version]);
 
   const analysis: Analysis | null = useMemo(() => (record ? analyzeRecord(record) : null), [record?.schema, record?.ops, record?.rows]); // eslint-disable-line react-hooks/exhaustive-deps
 

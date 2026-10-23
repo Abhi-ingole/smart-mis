@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { Download, FileDown, Printer } from "lucide-react";
+import { Download, FileDown, Presentation, Printer } from "lucide-react";
 import { toJpeg } from "html-to-image";
 import { DatasetGate, DatasetSwitcher, type Loaded } from "../components/DatasetGate";
 import { Alert, PageHeader, useToast } from "../components/ui";
@@ -11,6 +11,7 @@ import { download, reportPdf, reportWorkbook, tableCsv } from "../export/exporte
 import { fmtDate } from "../engine/format";
 import type { Filters } from "../engine/types";
 import logoUrl from "../assets/ingoviq-logo.png";
+import { makeExport } from "../state/useExport";
 
 export default function ReportBuilderPage() {
   return (
@@ -60,6 +61,20 @@ function Builder({ record, analysis }: Loaded) {
     }
   };
 
+  const exportPptx = async () => {
+    setBusy("pptx");
+    setError(null);
+    try {
+      const { name, blob } = await makeExport("pptx", { record, analysis, rows, kpiValues, insights, filtersNote, title, sections: include, appendixRows, root: () => previewRef.current });
+      download(name, blob, blob.type);
+      toast("success", "PowerPoint downloaded.");
+    } catch (e) {
+      setError(`Couldn't create the PowerPoint: ${(e as Error).message}`);
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const exportExcel = () => {
     download(`${fileBase}.xlsx`, reportWorkbook(model, analysis.table, rows), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     toast("success", "Excel report downloaded.");
@@ -82,6 +97,9 @@ function Builder({ record, analysis }: Loaded) {
               </button>
               <button className="btn-secondary" onClick={exportExcel}>
                 <Download className="h-4 w-4" /> Excel report
+              </button>
+              <button className="btn-secondary" onClick={exportPptx} disabled={busy !== null}>
+                <Presentation className="h-4 w-4" /> {busy === "pptx" ? "Preparing…" : "PowerPoint"}
               </button>
               <button className="btn-primary" onClick={exportPdf} disabled={busy !== null}>
                 <FileDown className="h-4 w-4" /> {busy === "pdf" ? "Preparing PDF…" : "PDF report"}
@@ -195,7 +213,7 @@ function Builder({ record, analysis }: Loaded) {
                 {model.charts.map((c) => (
                   <div key={c.id} className="print-avoid">
                     <p className="mb-2 text-sm font-semibold">{c.title}</p>
-                    <div data-report-chart data-title={c.title} className="bg-white">
+                    <div data-report-chart data-title={c.title} data-capture="" data-capture-title={c.title} className="bg-white">
                       <ChartView spec={c} table={analysis.table} rows={rows} height={240} animate={false} />
                     </div>
                   </div>

@@ -71,14 +71,14 @@ export function DatasetPicker({ base }: { base: string }) {
 }
 
 /** Small dataset switcher for page headers. */
-export function DatasetSwitcher({ base, currentId }: { base: string; currentId: string }) {
+export function DatasetSwitcher({ base, currentId, compact }: { base: string; currentId: string; compact?: boolean }) {
   const { datasets } = useDatasets();
   const navigate = useNavigate();
   if (!datasets || datasets.length < 2) return null;
   return (
     <label className="flex items-center gap-2 text-sm text-ink-soft">
       <span className="sr-only">Switch dataset</span>
-      <select className="input w-auto max-w-[16rem] py-1.5" value={currentId} onChange={(e) => navigate(`${base}/${e.target.value}`)}>
+      <select className={compact ? "max-w-[18rem] cursor-pointer bg-transparent text-xs text-ink-faint outline-none hover:text-ink" : "input w-auto max-w-[16rem] py-1.5"} value={currentId} onChange={(e) => navigate(`${base}/${e.target.value}`)}>
         {datasets.map((d) => (
           <option key={d.id} value={d.id}>
             {d.name}

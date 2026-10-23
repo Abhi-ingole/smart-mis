@@ -46,12 +46,15 @@ On Windows use the same commands in Command Prompt or PowerShell. To create `.en
 
 | Page | Purpose |
 |---|---|
-| **Overview** | Hero with *Upload your data* / *Explore demo*; recent datasets with quality score and a colour "type fingerprint" |
+| **Home** | Upload / sample data, the six steps of the workflow, recent datasets with quality score |
 | **Upload Data** | Drag-and-drop or choose several files, a whole folder, or ZIP archives (unpacked in the browser, zip-bomb limits applied); text PDFs are turned back into tables (scanned PDFs are reported, not guessed); pick worksheets; real progress through each analysis stage (runs in a Web Worker) |
 | **My Datasets** | Search, rename, preview original rows, delete, and **combine two datasets** with a guided join (key selection, match rate, warnings, preview) |
-| **Auto Dashboards** | KPI cards with formula, comparison with the previous period and a mini trend line; recommended charts; filters; add/remove/rename KPIs; add charts; one-click **PDF** of the whole dashboard |
-| **Report Builder** | 11-section MIS report preview; choose sections; export PDF / Excel / CSV; print-friendly layout |
-| **AI Insights** | Deterministic observations with evidence, separate recommendations, optional AI narrative |
+| **Review columns** | After upload, every column shows its suggested type, use and meaning with the reasons (header, values, date format); “Please check” items first; accept all or change, then confirm — KPIs and charts are rebuilt from the confirmed mapping |
+| **Dashboard** | Report-style header with **year selector** (Indian financial year Apr–Mar or calendar); KPI cards compared with the **same period last year** (like-for-like) or the previous month; monthly bars coloured by quarter; change vs last year / previous month; **category × quarter matrix** with data bars (Actuals / vs last year / % of total); ranked breakdown; detailed charts; filters; export menu (**PDF, PowerPoint, Excel, CSV**) |
+| **Ask a question** | Plain-English questions answered from the rows by rules (no external service): totals, averages, counts, “region wise”, top/bottom N, trends, filters by values, periods (“March 2026”, “FY 2025-26”, “last 3 months”), comparisons. Every answer shows how it was calculated; grouped answers can be added to the dashboard |
+| **Refresh & email** | Link the source file (Chrome/Edge) and refresh now or every N minutes; or pick an updated file. Schedule the report (working days / daily / weekly / monthly / hourly at a time): the file is created and an email draft + WhatsApp message with the key figures is prepared. Runs while the tab is open (no server) |
+| **Reports & export** | 11-section MIS report preview; choose sections; export PDF / Excel / **PowerPoint** / CSV; print-friendly layout |
+| **Insights** | Deterministic observations with evidence, separate recommendations, optional AI narrative |
 | **Data Quality** | Score and issues, duplicate inspector, **column mapping** (rename, type, role, meaning, exclude), questions for ambiguous columns, cleaning steps with preview and undo |
 | **Settings** | Local storage usage, delete all data, AI consent, limits |
 

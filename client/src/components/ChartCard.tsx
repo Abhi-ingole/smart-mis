@@ -101,17 +101,12 @@ export function ChartCard({ spec, table, rows, onChange, onRemove, wide, animate
   };
 
   return (
-    <section className={`card print-avoid flex min-w-0 flex-col p-4 ${wide ? "lg:col-span-2" : ""}`} data-chart-id={spec.id}>
+    <section className={`card group print-avoid flex min-w-0 flex-col p-4 ${wide ? "lg:col-span-2" : ""}`} data-chart-id={spec.id}>
       <div className="mb-3 flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <h3 className="truncate font-semibold" title={spec.title}>
-            {spec.title}
-          </h3>
-          <p className="truncate text-xs text-ink-faint" title={spec.reason}>
-            {spec.reason}
-          </p>
-        </div>
-        <div className="no-print relative flex shrink-0 items-center gap-0.5">
+        <h3 className="panel-title min-w-0 truncate" title={`${spec.title} — ${spec.reason}`}>
+          {spec.title}
+        </h3>
+        <div className={`no-print relative flex shrink-0 items-center gap-0.5 transition-opacity ${menu ? "opacity-100" : "opacity-40 group-focus-within:opacity-100 group-hover:opacity-100"}`}>
           {types.length > 1 && (
             <ToolButton label="Change chart type" active={menu === "type"} onClick={() => setMenu(menu === "type" ? null : "type")}>
               <ArrowLeftRight className="h-4 w-4" />
@@ -201,7 +196,7 @@ export function ChartCard({ spec, table, rows, onChange, onRemove, wide, animate
           </Popover>
         </div>
       </div>
-      <div ref={chartRef} data-chart-capture={spec.id} className="bg-white">
+      <div ref={chartRef} data-chart-capture={spec.id} {...(isRawTable ? {} : { "data-capture": "", "data-capture-title": spec.title, "data-capture-note": spec.reason })} className="bg-white">
         <ChartView spec={spec} table={table} rows={rows} data={data} animate={animate} />
       </div>
       {editing && <ChartEditor open spec={spec} schema={table.schema} onClose={() => setEditing(false)} onSave={(s) => (onChange(s), setEditing(false))} />}

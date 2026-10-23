@@ -33,6 +33,15 @@ function db() {
  */
 const memory = new Map<string, DatasetRecord>();
 
+/** Pages showing a dataset re-read it when it changes (e.g. after a scheduled refresh). */
+type Listener = (id: string) => void;
+const listeners = new Set<Listener>();
+export function onDatasetChange(fn: Listener): () => void {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+const emit = (id: string) => listeners.forEach((fn) => fn(id));
+
 let purged: Promise<void> | null = null;
 /** Removes datasets that earlier versions stored in IndexedDB (runs once per page load). */
 export function purgeStoredDatasets(): Promise<void> {
@@ -61,6 +70,7 @@ export async function getDataset(id: string): Promise<DatasetRecord | null> {
 
 export async function saveDataset(record: DatasetRecord): Promise<void> {
   memory.set(record.id, record);
+  emit(record.id);
 }
 
 /** Updates metadata only (schema, cleaning steps, dashboard…). Rows are never rewritten. */

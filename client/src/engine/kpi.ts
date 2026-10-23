@@ -328,7 +328,9 @@ export function recommendKpis(schema: ColumnSchema[], profiles: Record<string, C
   }
   // Row numbers (Sr., S.No, 1..n) always equal the row count, so count a real ID instead.
   const rowNumber = (c: (typeof ids)[number]) => /^(s[rl]\.?\s*(no\.?)?|s\.?\s*no\.?|serial(\s*no\.?)?|#|row)$/i.test(c.name.trim()) || c.notes.some((n) => n.startsWith("Consecutive"));
-  const mainId = ids.find((c) => !rowNumber(c));
+  // An ID that is unique on every row just repeats "Total records", so only count IDs that repeat (customers, accounts…).
+  const rowsTotal = table?.rows.length ?? 0;
+  const mainId = ids.find((c) => !rowNumber(c) && (profiles[c.key]?.distinct ?? 0) < rowsTotal * 0.98);
   if (domain.domain === "generic" && mainId) add({ name: `Distinct ${mainId.name}`, agg: "countDistinct", columnKey: mainId.key, format: "number", description: `Number of different ${mainId.name} values.` }, "ids");
 
   const mainDim = [...dims].sort((a, b) => dimScore(b) - dimScore(a))[0];
@@ -338,7 +340,7 @@ export function recommendKpis(schema: ColumnSchema[], profiles: Record<string, C
   }
   const mainMeasure = rankedMeasures.find((m) => defaultAgg(m) === "sum");
   if (mainDim) {
-    if (domain.domain === "generic") add({ name: `Distinct ${mainDim.name}`, agg: "countDistinct", columnKey: mainDim.key, format: "number", description: `Number of different ${mainDim.name} values.` }, "dim");
+    if (domain.domain === "generic" && (profiles[mainDim.key]?.distinct ?? 0) > 12) add({ name: `Distinct ${mainDim.name}`, agg: "countDistinct", columnKey: mainDim.key, format: "number", description: `Number of different ${mainDim.name} values.` }, "dim");
     add({
       name: mainMeasure ? `Top ${mainDim.name} by ${mainMeasure.name}` : `Most common ${mainDim.name}`,
       agg: "topShare",
