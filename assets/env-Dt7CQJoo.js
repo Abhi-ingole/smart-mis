@@ -1,1 +1,0 @@
-var e=`/smart-mis/`;async function t(){return{available:!1,provider:null,reason:`static`}}export{t as n,e as t};
